@@ -77,6 +77,9 @@ if __name__ == '__main__':
     init.init()
     import login
     login.login(state, config.username, config.password)
-    tracks = get_radio_list(state, config.radio_type, config.radio_id)
-    for track in tracks:
-        track.dump_info()
+    import time
+    for x in xrange(10):
+        tracks = get_radio_list(state, config.radio_type, config.radio_id)
+        for track in tracks:
+            track.dump_info()
+        time.sleep(5)
