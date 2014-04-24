@@ -44,7 +44,7 @@ class LoginPageParser(HTMLParser):
     def handle_data(self, data):
         pass
 
-def login(username, password):
+def login(state, username, password):
     login_page = urllib2.urlopen(login_url).read()
 
     # parse login page, find login arguments
@@ -80,10 +80,19 @@ def login(username, password):
             raise Exception(login_ret_parsed['message'])
         else:
             raise Exception('login failed')
+
+    state['user_nick'] = login_ret_parsed['data']['nick_name']
+    state['user_id'] = login_ret_parsed['data']['user_id']
+
+    if 'jumpurl' in login_ret_parsed and login_ret_parsed['jumpurl']:
+        jumpurl = login_ret_parsed['jumpurl']
+        jump_page = urllib2.urlopen(jumpurl).read()
+
     logger.info('login ok')
 
 if __name__ == '__main__':
     import init
     import config
+    state = {}
     init.init()
-    login(config.username, config.password)
+    login(state, config.username, config.password)
