@@ -9,6 +9,7 @@ logger = logging.getLogger('login')
 
 login_url = "https://login.xiami.com/member/login"
 login_post_url = "https://login.xiami.com/member/login"
+img_path = "/tmp/validate.png"
 
 class LoginPageParser(HTMLParser):
     def __init__(self):
@@ -58,14 +59,16 @@ def login(state, username, password):
     post_args['email'] = username
     post_args['password'] = password
 
-    # ask for validation code
     if 'validate' in post_args:
-        print "enter verification code from %s" % parser.validate_img
         img_content = urllib2.urlopen(parser.validate_img).read()
-        with open('/tmp/validate.png', 'w') as imgf:
-            imgf.write(img_content)
-        os.system('xdg-open /tmp/validate.png')
-        post_args['validate'] = raw_input('code: ')
+        return (False, post_args, img_content)
+
+    login_with_code(state, post_args, None)
+    return (True,)
+
+def login_with_code(state, post_args, code):
+    if code is not None:
+        post_args['validate'] = code
 
     # do login
     login_ret = urllib2.urlopen(login_post_url, urllib.urlencode(post_args)).read()
@@ -90,8 +93,19 @@ def login(state, username, password):
 
     logger.info('login ok')
 
+def login_console(state, username, password):
+    ret = login(state, username, password)
+    if not ret[0]:
+        # ask for validation code
+        print "enter verification code at %s" % img_path
+        with open(img_path, 'w') as imgf:
+            imgf.write(ret[2])
+        os.system('xdg-open %s' % img_path)
+        code = raw_input('code: ')
+        login_with_code(state, ret[1], code)
+
 if __name__ == '__main__':
     import init
     import config
     state = init.init()
-    login(state, config.username, config.password)
+    login_console(state, config.username, config.password)

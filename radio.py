@@ -124,7 +124,7 @@ if __name__ == '__main__':
     state = init.init()
     if not info.authenticated(state):
         import login
-        login.login(state, config.username, config.password)
+        login.login_console(state, config.username, config.password)
     visit_radio(state, config.radio_id)
     import time
     for x in xrange(10):
