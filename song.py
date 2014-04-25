@@ -1,8 +1,18 @@
 import urllib
+import urllib2
+
+lyric_url_temp = "http://www.xiami.com/radio/lyric?sid=%s"
 
 class Song(object):
     def dump_info(self):
         print self.title, self.location
+
+    def get_lyric(self):
+        if not hasattr(self, 'song_id'):
+            raise Exception("missing song id")
+        lyric_url = lyric_url_temp % self.song_id
+        lyric = urllib2.urlopen(lyric_url).read()
+        return lyric
 
 def decrypt_location(encrypted):
     output = ''
