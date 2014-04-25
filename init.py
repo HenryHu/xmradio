@@ -2,7 +2,6 @@ import cookielib
 import urllib2
 import logging
 import atexit
-import functools
 import logging
 
 cookie_store = "cookies.txt"
@@ -24,7 +23,7 @@ def init():
     urllib2.install_opener(opener)
 
     state = {'cookiejar': cj}
-    atexit.register(functools.partial(save_cookies, state))
+    atexit.register(save_cookies, state)
     return state
 
 def save_cookies(state):
