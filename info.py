@@ -18,3 +18,11 @@ def get_xiamitoken(state):
             logger.debug('_xiamitoken = %s' % cookie.value)
             return cookie.value
     raise Exception("fail to find xiami token!")
+
+def authenticated(state):
+    for cookie in state['cookiejar']:
+        if cookie.name == 'member_auth':
+            logger.debug('already authenticated')
+            return True
+    logger.debug('not authenticated')
+    return False
