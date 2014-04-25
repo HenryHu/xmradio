@@ -7,6 +7,7 @@ import info
 lyric_url = "http://www.xiami.com/radio/lyric"
 related_info_url = "http://www.xiami.com/radio/relate-info"
 get_hq_url_temp = "http://www.xiami.com/song/gethqsong/sid/%s"
+similar_artists_url_temp = "http://www.xiami.com/ajax/similar-artists?id=%s&c=%d"
 
 logger = logging.getLogger('song')
 
@@ -68,6 +69,14 @@ class Song(object):
         request.add_header('Referer', state['radio_page_path'])
         related_info = urllib2.urlopen(request, args).read()
         return related_info
+
+    def get_similar_artists(self, count):
+        if not hasattr(self, 'artist_id'):
+            raise Exception("missing artist id")
+
+        similar_artists_url = similar_artists_url_temp % (self.artist_id, count)
+        similar_artists = urllib2.urlopen(similar_artists_url).read()
+        return json.loads(similar_artists)
 
 def decrypt_location(encrypted):
     output = ''
