@@ -8,6 +8,7 @@ lyric_url = "http://www.xiami.com/radio/lyric"
 related_info_url = "http://www.xiami.com/radio/relate-info"
 get_hq_url_temp = "http://www.xiami.com/song/gethqsong/sid/%s"
 similar_artists_url_temp = "http://www.xiami.com/ajax/similar-artists?id=%s&c=%d"
+song_url_temp = "http://www.xiami.com/song/%s"
 
 logger = logging.getLogger('song')
 
@@ -77,6 +78,12 @@ class Song(object):
         similar_artists_url = similar_artists_url_temp % (self.artist_id, count)
         similar_artists = urllib2.urlopen(similar_artists_url).read()
         return json.loads(similar_artists)
+
+    def get_song_url(self):
+        if not hasattr(self, 'song_id'):
+            raise Exception("missing song id")
+
+        return song_url_temp % self.song_id
 
 def decrypt_location(encrypted):
     output = ''
