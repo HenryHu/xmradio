@@ -8,6 +8,7 @@ import logging
 radio_url_temp = "http://www.xiami.com/radio/play/type/%s/oid/%s"
 radio_list_url_temp = "http://www.xiami.com/radio/xml/type/%s/id/%s?v=%s"
 player_path_prefix = '/res/fm/xiamiRadio'
+player_host = "http://www.xiami.com"
 
 logger = logging.getLogger('radio')
 
@@ -15,6 +16,7 @@ class RadioPageParser(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
         self.v_val = ''
+        self.player_path = ''
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
@@ -26,6 +28,7 @@ class RadioPageParser(HTMLParser):
                     split_pair = pair.split('=')
                     if len(split_pair) == 2 and split_pair[0] == 'v':
                         self.v_val = split_pair[1]
+                self.player_path = path
 
 def visit_radio(state, radio_type, radio_id):
     radio_url = radio_url_temp % (radio_type, radio_id)
@@ -38,6 +41,8 @@ def visit_radio(state, radio_type, radio_id):
         state['v_val'] = '0'
     else:
         state['v_val'] = parser.v_val
+    if parser.player_path:
+        state['player_path'] = player_host + parser.player_path
 
 def get_radio_list(state, radio_type, radio_id):
     # visit the radio page to get v value

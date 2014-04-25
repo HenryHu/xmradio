@@ -1,9 +1,27 @@
 import urllib
 import urllib2
+import json
+import logging
 
 lyric_url_temp = "http://www.xiami.com/radio/lyric?sid=%s"
+get_hq_url_temp = "http://www.xiami.com/song/gethqsong/sid/%s"
+
+logger = logging.getLogger('song')
 
 class Song(object):
+    # expected attributes:
+    # * title
+    # * song_id
+    # * album_id
+    # * album_name
+    # * grade
+    # * artist
+    # * location
+    # * pic
+    # * length
+    # * artist_id
+    # * rec_note
+    # * hq_location
     def dump_info(self):
         print self.title, self.location
 
@@ -13,6 +31,28 @@ class Song(object):
         lyric_url = lyric_url_temp % self.song_id
         lyric = urllib2.urlopen(lyric_url).read()
         return lyric
+
+    def get_hq_location(self, state):
+        if not hasattr(self, 'song_id'):
+            raise Exception("missing song id")
+
+        if hasattr(self, 'hq_location'):
+            return self.hq_location
+
+        get_hq_url = get_hq_url_temp % self.song_id
+        logger.debug("get hq req: %s" % get_hq_url)
+        get_hq_req = urllib2.Request(get_hq_url)
+        if 'player_path' in state:
+            get_hq_req.add_header('Referer', state['player_path'])
+        get_hq_rep = urllib2.urlopen(get_hq_req).read()
+
+        get_hq_parsed = json.loads(get_hq_rep)
+
+        if not 'status' in get_hq_parsed or get_hq_parsed['status'] != 1:
+            raise Exception("fail to get hq url. status = %d" % get_hq_parsed['status'])
+
+        self.hq_location = decrypt_location(get_hq_parsed['location'])
+        return self.hq_location
 
 def decrypt_location(encrypted):
     output = ''
