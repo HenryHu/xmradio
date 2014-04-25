@@ -54,3 +54,4 @@ docs/_build/
 
 # private files
 config.py
+cookies.txt
