@@ -43,6 +43,7 @@ def visit_radio(state, radio_type, radio_id):
         state['v_val'] = parser.v_val
     if parser.player_path:
         state['player_path'] = player_host + parser.player_path
+    state['radio_page_path'] = radio_url
 
 def get_radio_list(state, radio_type, radio_id):
     # visit the radio page to get v value
@@ -78,8 +79,7 @@ def get_radio_list(state, radio_type, radio_id):
 if __name__ == '__main__':
     import init
     import config
-    state = {}
-    init.init()
+    state = init.init()
     import login
     login.login(state, config.username, config.password)
     import time

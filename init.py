@@ -10,3 +10,6 @@ def init():
 
     logging.basicConfig(level=logging.DEBUG)
 
+    state = {'cookiejar': cj}
+    return state
+

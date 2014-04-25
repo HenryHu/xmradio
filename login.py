@@ -93,6 +93,5 @@ def login(state, username, password):
 if __name__ == '__main__':
     import init
     import config
-    state = {}
-    init.init()
+    state = init.init()
     login(state, config.username, config.password)

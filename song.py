@@ -2,8 +2,10 @@ import urllib
 import urllib2
 import json
 import logging
+import info
 
-lyric_url_temp = "http://www.xiami.com/radio/lyric?sid=%s"
+lyric_url = "http://www.xiami.com/radio/lyric"
+related_info_url = "http://www.xiami.com/radio/relate-info"
 get_hq_url_temp = "http://www.xiami.com/song/gethqsong/sid/%s"
 
 logger = logging.getLogger('song')
@@ -28,8 +30,9 @@ class Song(object):
     def get_lyric(self):
         if not hasattr(self, 'song_id'):
             raise Exception("missing song id")
-        lyric_url = lyric_url_temp % self.song_id
-        lyric = urllib2.urlopen(lyric_url).read()
+        # use POST as the official one
+        args = urllib.urlencode({'sid' : self.song_id})
+        lyric = urllib2.urlopen(lyric_url, args).read()
         return lyric
 
     def get_hq_location(self, state):
@@ -53,6 +56,18 @@ class Song(object):
 
         self.hq_location = decrypt_location(get_hq_parsed['location'])
         return self.hq_location
+
+    def get_related_info(self, state):
+        if not hasattr(self, 'artist_id'):
+            raise Exception("missing artist id")
+
+        xiamitoken = info.get_xiamitoken(state)
+        # use POST as the official one
+        args = urllib.urlencode({'arid': self.artist_id, '_xiamitoken': xiamitoken})
+        request = urllib2.Request(related_info_url)
+        request.add_header('Referer', state['radio_page_path'])
+        related_info = urllib2.urlopen(request, args).read()
+        return related_info
 
 def decrypt_location(encrypted):
     output = ''
