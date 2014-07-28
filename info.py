@@ -1,4 +1,9 @@
 import logging
+import urllib2
+import json
+
+is_vip_url = "http://www.xiami.com/vip/role"
+
 logger = logging.getLogger('info')
 
 def update_state(state, config_node):
@@ -26,3 +31,13 @@ def authenticated(state):
             return True
     logger.debug('not authenticated')
     return False
+
+def is_vip(state):
+    isvip_resp = urllib2.urlopen(is_vip_url).read()
+    isvip_parsed = json.loads(isvip_resp)
+    if not 'status' in isvip_parsed or isvip_parsed['status'] != 1:
+        if 'message' in isvip_parsed:
+            raise Exception(u"fail to check vip status: %s" % isvip_parsed['message'])
+        else:
+            raise Exception("fail to check vip status")
+    return isvip_parsed['data']['vip'] == 1
