@@ -3,6 +3,7 @@ import urllib2
 import json
 
 is_vip_url = "http://www.xiami.com/vip/role"
+stat_url_temp = "http://www.xiami.com/count/playstat?type=0&vip_role=%d&song_id=%s"
 
 logger = logging.getLogger('info')
 
@@ -33,6 +34,8 @@ def authenticated(state):
     return False
 
 def is_vip(state):
+    if 'vip' in state:
+        return state['vip']
     isvip_resp = urllib2.urlopen(is_vip_url).read()
     isvip_parsed = json.loads(isvip_resp)
     if not 'status' in isvip_parsed or isvip_parsed['status'] != 1:
@@ -40,4 +43,11 @@ def is_vip(state):
             raise Exception(u"fail to check vip status: %s" % isvip_parsed['message'])
         else:
             raise Exception("fail to check vip status")
-    return isvip_parsed['data']['vip'] == 1
+    result = isvip_parsed['data']['vip'] == 1
+    state['vip'] = result
+    return result
+
+def add_stat(state, song_id):
+    stat_url = stat_url_temp % (1 if is_vip(state) else 0, song_id)
+    urllib2.urlopen(stat_url).read()
+

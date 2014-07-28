@@ -16,7 +16,11 @@ ERROR_WAIT = 5
 
 def play_track(state, track):
     print("Listening to: %s by %s from album %s" % (track.title, track.artist, track.album_name))
-    url = track.get_hq_location(state)
+    if info.is_vip(state):
+        url = track.get_hq_location(state)
+    else:
+        url = track.location
+    info.add_stat(state, track.song_id)
     os.system("mplayer -prefer-ipv4 -really-quiet -cache 10240 -cache-min 10 %s" % url)
 
 def play_guessed_list(state):
