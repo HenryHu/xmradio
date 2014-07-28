@@ -26,6 +26,10 @@ class Song(object):
     # * artist_id
     # * rec_note
     # * hq_location
+    def __init__(self, parsed = {}):
+        for key in parsed:
+            setattr(self, key, parsed[key])
+
     def dump_info(self):
         print self.title, self.location
 
@@ -51,7 +55,11 @@ class Song(object):
             get_hq_req.add_header('Referer', state['player_path'])
         get_hq_rep = urllib2.urlopen(get_hq_req).read()
 
-        get_hq_parsed = json.loads(get_hq_rep)
+        try:
+            get_hq_parsed = json.loads(get_hq_rep)
+        except Exception as e:
+            logger.exception("fail to parse get hq reply: %s", get_hq_rep)
+            raise e
 
         if not 'status' in get_hq_parsed or get_hq_parsed['status'] != 1:
             raise Exception("fail to get hq url. status = %d" % get_hq_parsed['status'])
