@@ -41,6 +41,7 @@ def play_guessed_list(state):
     while True:
         for track in guessed_list.tracks:
             play_track(state, track)
+            info.record_play(state, track.song_id, "guess", info.is_vip(state), None)
             time.sleep(1)
 
 def play_radio(state, radio_id):
@@ -54,6 +55,8 @@ def play_radio(state, radio_id):
             continue
         for track in tracks:
             play_track(state, track)
+            # type 10 -> play from radio
+            info.record_play(state, track.song_id, None, info.is_vip(state), "10")
             time.sleep(1)
 
 def select_radio_station(state):
