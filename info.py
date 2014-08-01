@@ -3,9 +3,13 @@ import urllib2
 import json
 
 is_vip_url = "http://www.xiami.com/vip/role"
-stat_url_temp = "http://www.xiami.com/count/playstat?type=0&vip_role=%d&song_id=%s"
+stat_url_temp = "http://www.xiami.com/count/playstat?type=%d&vip_role=%d&song_id=%s"
 
 logger = logging.getLogger('info')
+
+STAT_BEGIN = 0
+STAT_NEAREND = 2
+STAT_END = 3
 
 def update_state(state, config_node):
     for child in config_node:
@@ -47,7 +51,7 @@ def is_vip(state):
     state['vip'] = result
     return result
 
-def add_stat(state, song_id):
-    stat_url = stat_url_temp % (1 if is_vip(state) else 0, song_id)
+def add_stat(state, pos, song_id):
+    stat_url = stat_url_temp % (pos, 1 if is_vip(state) else 0, song_id)
     urllib2.urlopen(stat_url).read()
 

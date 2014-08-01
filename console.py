@@ -16,12 +16,24 @@ ERROR_WAIT = 5
 
 def play_track(state, track):
     print("Listening to: %s by %s from album %s" % (track.title, track.artist, track.album_name))
-    if info.is_vip(state):
-        url = track.get_hq_location(state)
+    is_hq = info.is_vip(state)
+    if is_hq:
+        try:
+            url = track.get_hq_location(state)
+        except Exception as e:
+            print("WARNING: error occoured when fetching high quality source: %r" % e)
+            url = track.location
     else:
         url = track.location
-    info.add_stat(state, track.song_id)
+    try:
+        info.add_stat(state, info.STAT_BEGIN, track.song_id)
+    except Exception as e:
+        print("WARNING: error occoured when reporting stat: %r" % e)
     os.system("mplayer -prefer-ipv4 -really-quiet -cache 10240 -cache-min 10 %s" % url)
+    try:
+        info.add_stat(state, info.STAT_END, track.song_id)
+    except Exception as e:
+        print("WARNING: error occoured when reporting stat: %r" % e)
 
 def play_guessed_list(state):
     guessed_list = playlist.get_guess_list(state)
