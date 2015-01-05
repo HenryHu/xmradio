@@ -1,5 +1,6 @@
 import song
 import logging
+import os
 
 class LocalPlaylist(object):
     def __init__(self):
@@ -20,6 +21,13 @@ class LocalPlaylist(object):
 
                 line = inf.readline()
 
+    def save(self, filename):
+        if os.path.exists(filename):
+            os.rename(filename, filename + os.extsep + "old")
+        with open(filename, 'w') as outf:
+            for track in self.items:
+                outf.write("%s\n" % (track.song_id))
+
     def count(self):
         return len(self.items)
 
@@ -30,3 +38,9 @@ class LocalPlaylist(object):
         except:
             logging.exception("error loading info")
         return track
+
+    def insert(self, track, idx = 0):
+        self.items.insert(idx, track)
+
+    def append(self, track):
+        self.items += [track]
