@@ -14,7 +14,6 @@ logger = logging.getLogger("console")
 ERROR_WAIT = 5
 
 def play_track(state, track):
-    print("Listening to: %s by %s from album %s" % (track.title, track.artist, track.album_name))
     is_hq = info.is_vip(state)
     if is_hq:
         try:
@@ -22,8 +21,10 @@ def play_track(state, track):
         except Exception as e:
             print("WARNING: error occoured when fetching high quality source: %r" % e)
             url = track.location
+            is_hq = False
     else:
         url = track.location
+    print("Listening to: %s by %s from album %s%s" % (track.title, track.artist, track.album_name, " [HQ]" if is_hq else ""))
     try:
         info.add_stat(state, info.STAT_BEGIN, track.song_id)
     except Exception as e:
@@ -55,7 +56,10 @@ def play_radio(state, radio_id):
         for track in tracks:
             play_track(state, track)
             # type 10 -> play from radio
-            info.record_play(state, track.song_id, None, info.is_vip(state), "10")
+            try:
+                info.record_play(state, track.song_id, None, info.is_vip(state), "10")
+            except:
+                logger.exception("fail to record")
             time.sleep(1)
 
 def select_radio_station(state):
