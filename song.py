@@ -3,14 +3,67 @@ import urllib2
 import json
 import logging
 import info
+import re
+from HTMLParser import HTMLParser
 
 lyric_url = "http://www.xiami.com/radio/lyric"
 related_info_url = "http://www.xiami.com/radio/relate-info"
 get_hq_url_temp = "http://www.xiami.com/song/gethqsong/sid/%s"
 similar_artists_url_temp = "http://www.xiami.com/ajax/similar-artists?id=%s&c=%d"
 song_url_temp = "http://www.xiami.com/song/%s"
+artist_id_rex = re.compile("/artist/([0-9]+)")
+song_info_url_temp = "http://www.xiami.com/song/playlist/id/%s/object_name/default/object_id/0/cat/json"
 
 logger = logging.getLogger('song')
+
+class SongPageParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.title = None
+        self.artist = None
+        self.album = None
+        self.image = None
+        self.album_id = None
+        self.artist_id = None
+
+        self.in_nav = False
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == 'meta':
+            try:
+                prop = attrs['property']
+                content = attrs['content']
+                if prop == 'og:title':
+                    self.title = content
+                elif prop == 'og:music:artist':
+                    self.artist = content
+                elif prop == 'og:music:album':
+                    self.album = content
+                elif prop == 'og:image':
+                    self.image = content
+            except:
+                pass
+        elif tag == 'a':
+            try:
+                if attrs['id'] == 'albumCover':
+                    href = attrs['href']
+                    self.album_id = href.split('/')[-1]
+            except:
+                pass
+            if self.in_nav:
+                if 'href' in attrs:
+                    ret = artist_id_rex.match(attrs['href'])
+                    if ret:
+                        self.artist_id = ret.group(1)
+        elif tag == 'div':
+            if 'id' in attrs and attrs['id'] == 'nav':
+                self.in_nav = True
+
+    def handle_endtag(self, tag):
+        if tag == 'div':
+            if self.in_nav:
+                self.in_nav = False
 
 class Song(object):
     # expected attributes:
@@ -92,6 +145,39 @@ class Song(object):
             raise Exception("missing song id")
 
         return song_url_temp % self.song_id
+
+    def load_info(self):
+        if not hasattr(self, 'song_id'):
+            raise Exception("missing song id")
+
+        song_info_url = song_info_url_temp % self.song_id
+        song_info_ret = urllib2.urlopen(song_info_url).read()
+        song_info = json.loads(song_info_ret)
+
+        if not 'status' in song_info or not song_info['status']:
+            raise Exception("fail to load song info.%s" %
+                (song_info['message'] if 'message' in song_info else ""))
+
+        my_info = song_info['data']['trackList'][0]
+        self.__init__(my_info)
+
+    def load_info_from_page(self):
+        ''' Load info of this song, index by song_id (deprecated)'''
+        # missing:
+        # * grade
+        # * location
+        # * length
+        # * rec_note
+        url = self.get_song_url()
+        song_page = urllib2.urlopen(url).read().decode('utf-8')
+        parser = SongPageParser()
+        parser.feed(song_page)
+        self.title = parser.title
+        self.album_name = parser.album
+        self.artist = parser.artist
+        self.pic = parser.image
+        self.album_id = parser.album_id
+        self.artist_id = parser.artist_id
 
 def decrypt_location(encrypted):
     output = ''
