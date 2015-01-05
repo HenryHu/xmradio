@@ -8,7 +8,6 @@ import os
 import logging
 import playlist
 
-logging.basicConfig(level=logging.WARN)
 
 logger = logging.getLogger("console")
 
@@ -113,10 +112,12 @@ def authenticate(state):
         password = getpass.getpass("password: ")
         login.login_console(state, username, password)
 
-state = init.init()
-authenticate(state)
-radio_id = select_radio_station(state)
-if radio_id == 'g':
-    play_guessed_list(state)
-else:
-    play_radio(state, radio_id)
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.WARN)
+    state = init.init()
+    authenticate(state)
+    radio_id = select_radio_station(state)
+    if radio_id == 'g':
+        play_guessed_list(state)
+    else:
+        play_radio(state, radio_id)
