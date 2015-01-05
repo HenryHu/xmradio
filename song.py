@@ -83,6 +83,11 @@ class Song(object):
         for key in parsed:
             setattr(self, key, parsed[key])
 
+        if hasattr(self, 'location'):
+            self.info_loaded = True
+        else:
+            self.info_loaded = False
+
     def dump_info(self):
         print self.title, self.location
 
@@ -150,6 +155,10 @@ class Song(object):
         if not hasattr(self, 'song_id'):
             raise Exception("missing song id")
 
+        if self.info_loaded:
+            return
+
+        logging.debug("loading info of %s" % self.song_id)
         song_info_url = song_info_url_temp % self.song_id
         song_info_ret = urllib2.urlopen(song_info_url).read()
         song_info = json.loads(song_info_ret)
