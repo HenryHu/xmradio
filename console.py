@@ -41,7 +41,10 @@ def play_guessed_list(state):
     while True:
         for track in guessed_list.tracks:
             play_track(state, track)
-            info.record_play(state, track.song_id, "guess", info.is_vip(state), None)
+            try:
+                info.record_play(state, track.song_id, "guess", info.is_vip(state), None)
+            except:
+                logger.exception("fail to record")
             time.sleep(1)
 
 def play_radio(state, radio_id):
