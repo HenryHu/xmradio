@@ -7,7 +7,7 @@ import time
 import os
 import logging
 import playlist
-
+import HTMLParser
 
 logger = logging.getLogger("console")
 
@@ -80,9 +80,10 @@ def select_radio_station(state):
                 fav_radio_page -= 1
                 continue
         idx = 1
+        unescaper = HTMLParser.HTMLParser()
         for fav_radio in fav_radios:
-            print("Radio %d: %s fav by %s people" % (idx, fav_radio['radio_name'], fav_radio['fav_count']))
-            print("    %s" % (fav_radio['description']))
+            print("Radio %d: %s fav by %s people" % (idx, unescaper.unescape(fav_radio['radio_name']), fav_radio['fav_count']))
+            print("    %s" % (unescaper.unescape(fav_radio['description'])))
             idx += 1
         sel = raw_input("Select radio station [1-%d], [n] for next page, [p] for prev page, [g] for guessed playlist:" % (len(fav_radios)))
         if sel.isdigit():
