@@ -9,7 +9,7 @@ import re
 
 radio_url_temp = "http://www.xiami.com/radio/play/id/%s"
 radio_list_url_temp = "http://www.xiami.com/radio/xml/type/%s/id/%s?v=%s"
-player_path_prefix = '/res/fm/xiamiRadio'
+player_path_signature = '/res/fm/xiamiRadio'
 player_host = "http://www.xiami.com"
 fav_radio_url_temp = "http://www.xiami.com/radio/favlist?page=%d"
 radio_data_rex = re.compile("/radio/xml/type/([0-9]+)/id/([0-9]+)")
@@ -28,7 +28,7 @@ class RadioPageParser(HTMLParser):
         attrs = dict(attrs)
         if tag == 'object' and attrs['type'] == 'application/x-shockwave-flash':
             path = attrs['data']
-            if path.startswith(player_path_prefix):
+            if player_path_signature in path:
                 values = path.split('?')[1]
                 for pair in values.split('&'):
                     split_pair = pair.split('=')
@@ -68,7 +68,6 @@ def visit_radio(state, radio_pid):
 
 def get_radio_list(state, radio_type, radio_id):
     # visit the radio page to get v value
-    # TODO not sure if this is required
     if not 'v_val' in state:
         raise Exception("visit radio page first")
 
