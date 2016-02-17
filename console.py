@@ -8,6 +8,7 @@ import os
 import logging
 import playlist
 import HTMLParser
+import random
 
 logger = logging.getLogger("console")
 
@@ -39,6 +40,8 @@ def play_guessed_list(state):
     guessed_list = playlist.get_guess_list(state)
     guessed_list.visit_player(state)
     while True:
+        if state['random']:
+            random.shuffle(guessed_list.tracks)
         for track in guessed_list.tracks:
             play_track(state, track)
             try:
@@ -56,6 +59,8 @@ def play_radio(state, radio_id):
             logger.exception("fail to get list of songs")
             time.sleep(ERROR_WAIT)
             continue
+        if state['random']:
+            random.shuffle(tracks)
         for track in tracks:
             play_track(state, track)
             # type 10 -> play from radio
@@ -88,7 +93,13 @@ def select_radio_station(state):
             print("Radio %d: %s fav by %s people" % (idx, unescaper.unescape(fav_radio['radio_name']), fav_radio['fav_count']))
             print("    %s" % (unescaper.unescape(fav_radio['description'])))
             idx += 1
-        sel = raw_input("Select radio station [1-%d], [n] for next page, [p] for prev page, [g] for guessed playlist:" % (len(fav_radios)))
+        sel = raw_input("Select radio station [1-%d], [n] for next page, [p] for prev page, [g] for guessed playlist, [r] for random:" % (len(fav_radios)))
+
+        state['random'] = False
+        if 'r' in sel:
+            state['random'] = True
+            sel.replace('r', '')
+
         if sel.isdigit():
             sel = int(sel)
             if sel < 1 or sel > len(fav_radios):
