@@ -25,7 +25,7 @@ def play_track(state, track):
             is_hq = False
     else:
         url = track.location
-    print("Listening to: %s by %s from album %s%s" % (track.title, track.artist, track.album_name, " [HQ]" if is_hq else ""))
+    print("Listening to: %s by %s from album %s%s #%s" % (track.title, track.artist, track.album_name, " [HQ]" if is_hq else "", track.song_id))
     try:
         info.add_stat(state, info.STAT_BEGIN, track.song_id)
     except Exception as e:
