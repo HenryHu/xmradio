@@ -30,7 +30,8 @@ def play_track(state, track):
         info.add_stat(state, info.STAT_BEGIN, track.song_id)
     except Exception as e:
         print("WARNING: error occoured when reporting stat: %r" % e)
-    os.system("mplayer -prefer-ipv4 -really-quiet -cache 10240 -cache-min 10 %s" % url)
+#    os.system("mplayer -prefer-ipv4 -quiet -cache 10240 -cache-min 10 %s" % url)
+    os.system("mpv -audio-samplerate=96000 --really-quiet -cache 10240 %s" % url)
     try:
         info.add_stat(state, info.STAT_END, track.song_id)
     except Exception as e:
