@@ -98,8 +98,9 @@ class ThingsModel(QtCore.QAbstractListModel):
             self._things[self.last_highlight]._highlight = False
             self.dataChanged.emit(
                     self.index(self.last_highlight), self.index(self.last_highlight))
-        self._things[idx]._highlight = True
-        self.dataChanged.emit(self.index(idx), self.index(idx))
+        if idx != -1:
+            self._things[idx]._highlight = True
+            self.dataChanged.emit(self.index(idx), self.index(idx))
         self.last_highlight = idx
 
 def authenticate(state):
@@ -116,6 +117,7 @@ class MainWin(QtCore.QObject):
 
     def guess_and_play(self):
         self.clear_playlist()
+        self.fav_model.set_highlight(-1)
         guessed_list = playlist.get_guess_list(self.state)
         guessed_list.visit_player(self.state)
         for track in guessed_list.tracks:
