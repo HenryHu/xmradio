@@ -13,7 +13,7 @@ import HTMLParser
 import random
 from functools import partial
 
-from PyQt5.QtCore import QObject, QUrl, pyqtSignal, pyqtProperty
+from PyQt5.QtCore import QObject, QUrl
 from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtQuick import QQuickView
 
@@ -185,9 +185,7 @@ class MainWin(QtCore.QObject):
         self.playlist_model.clear()
         self.play_idx = 0
 
-    @QtCore.pyqtSlot(QtCore.QObject)
-    def station_clicked(self, station):
-        idx = self.root_obj.currentStation()
+    def station_clicked(self, station, idx):
         self.fav_model.set_highlight(idx)
 
         _station = station._station
@@ -213,9 +211,7 @@ class MainWin(QtCore.QObject):
         for track in tracks:
             self.add_track(track)
 
-    @QtCore.pyqtSlot(QtCore.QObject)
-    def song_clicked(self, song):
-        idx = self.main_win.rootObject().currentSong()
+    def song_clicked(self, song, idx):
         self.play_idx = idx
         self.start_player()
 
@@ -361,6 +357,8 @@ class MainWin(QtCore.QObject):
         self.root_obj.playerPosition.connect(self.player_position)
         self.root_obj.playerStatus.connect(self.player_status)
         self.root_obj.progressSeek.connect(self.progress_seek)
+        self.root_obj.songClicked.connect(self.song_clicked)
+        self.root_obj.stationClicked.connect(self.station_clicked)
 
         self.fav_model = ThingsModel([])
         self.playlist_model = ThingsModel([])
@@ -368,12 +366,12 @@ class MainWin(QtCore.QObject):
         fav_list.setProperty("model", self.fav_model)
         playlist_list = self.root_obj.findChild(QObject, "playlist")
         playlist_list.setProperty("model", self.playlist_model)
-        self.play_idx = 0
 
         self.set_status("Ready")
-        rc = self.main_win.rootContext()
-        rc.setContextProperty("controller", self)
+#        rc = self.main_win.rootContext()
+#        rc.setContextProperty("controller", self)
 
+        self.play_idx = 0
         self.duration = 0
         self.position = 0
         self.current_station = None

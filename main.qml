@@ -21,6 +21,8 @@ Rectangle {
     signal playerDuration(int duration)
     signal playerStatus(int status)
     signal progressSeek(real x, real width)
+    signal songClicked(var item, int index)
+    signal stationClicked(var item, int index)
 
     function setStatus(statusText) {
         status.text = statusText
@@ -45,6 +47,10 @@ Rectangle {
 
     function play() {
         player.play()
+    }
+
+    function stop() {
+        player.stop()
     }
 
     function seek(position) {
@@ -159,7 +165,7 @@ Rectangle {
                 hoverEnabled: true
                 onDoubleClicked: {
                     playlist.currentIndex = model.index
-                    controller.song_clicked(model.display, model.index)
+                    songClicked(model.display, model.index)
                 }
                 onEntered: songCell.color = "lightgreen"
                 onExited: songCell.color = decideColor()
@@ -287,7 +293,7 @@ Rectangle {
                 anchors.fill: parent
                 onDoubleClicked: {
                     favStations.currentIndex = model.index
-                    controller.station_clicked(model.display)
+                    stationClicked(model.display, model.index)
                 }
                 hoverEnabled: true
                 onEntered: stationCell.color = "lightgreen"
