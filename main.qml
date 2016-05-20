@@ -18,6 +18,7 @@ Rectangle {
     signal playerPosition(int position)
     signal playerDuration(int duration)
     signal playerStatus(int status)
+    signal progressSeek(real x, real width)
 
     function setStatus(statusText) {
         status.text = statusText
@@ -315,6 +316,13 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             font.pixelSize: 12
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                progressSeek(mouse.x, width)
+            }
         }
     }
 

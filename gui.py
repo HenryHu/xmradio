@@ -187,6 +187,10 @@ class MainWin(QtCore.QObject):
         self.play_idx = idx
         self.start_player()
 
+    def progress_seek(self, x, width):
+        if self.duration != 0:
+            self.root_obj.seek(x * self.duration / width)
+
     def add_track(self, track):
         self.playlist_model.append(SongWrapper(track))
 
@@ -318,6 +322,7 @@ class MainWin(QtCore.QObject):
         self.root_obj.pauseClicked.connect(self.pause_clicked)
         self.root_obj.playerPosition.connect(self.player_position)
         self.root_obj.playerStatus.connect(self.player_status)
+        self.root_obj.progressSeek.connect(self.progress_seek)
 
         self.fav_model = ThingsModel([])
         self.playlist_model = ThingsModel([])
