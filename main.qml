@@ -199,8 +199,8 @@ Rectangle {
 
     Button {
         id: btnGuess
-        x: 59
-        y: 4
+        anchors.left: lblPlaylist.right
+        anchors.leftMargin: 8
         text: qsTr("Guess")
         anchors.verticalCenter: lblPlaylist.verticalCenter
         onClicked: guessClicked()
