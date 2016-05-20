@@ -124,8 +124,8 @@ Rectangle {
             Image {
                 id: songImage
                 source: model.display.image_url
-                height: parent.height - 6
-                width: height
+                height: 36
+                width: 36
                 anchors.left: parent.left
                 anchors.leftMargin: 3
                 anchors.top: parent.top
