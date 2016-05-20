@@ -284,6 +284,7 @@ class MainWin(QtCore.QObject):
             self.proper_next()
 
     def player_ended(self):
+        # 7 = EndOfMedia
         return self.main_win.rootObject().getPlayerStatus() == 7
 
     def player_position(self, position):

@@ -113,7 +113,9 @@ Rectangle {
             id: songCell
             height: songTitle.height + songDesc.height + 5
             width: playlist.width
-            color: {
+            color: decideColor()
+
+            function decideColor() {
                 if (model.display.highlight) {
                     return "lightblue"
                 } else {
@@ -140,10 +142,13 @@ Rectangle {
             }
             MouseArea {
                 anchors.fill: parent
+                hoverEnabled: true
                 onDoubleClicked: {
                     playlist.currentIndex = model.index
                     controller.song_clicked(model.display, model.index)
                 }
+                onEntered: songCell.color = "lightgreen"
+                onExited: songCell.color = decideColor()
             }
         }
     }
@@ -216,13 +221,15 @@ Rectangle {
             id: stationCell
             height: stationTitle.height + stationDesc.height + 10
             width: favStations.width
-            color: {
+
+            function decideColor() {
                 if (model.display.highlight) {
                     return "lightblue"
                 } else {
                     return "white"
                 }
             }
+            color: decideColor()
 
             Text {
                 id: stationTitle
@@ -247,6 +254,9 @@ Rectangle {
                     favStations.currentIndex = model.index
                     controller.station_clicked(model.display)
                 }
+                hoverEnabled: true
+                onEntered: stationCell.color = "lightgreen"
+                onExited: stationCell.color = decideColor()
             }
         }
     }
