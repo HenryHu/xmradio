@@ -96,7 +96,8 @@ class ThingsModel(QtCore.QAbstractListModel):
     def set_highlight(self, idx):
         if self.last_highlight != -1 and self.last_highlight < len(self._things):
             self._things[self.last_highlight]._highlight = False
-            self.dataChanged.emit(self.index(self.last_highlight), self.index(self.last_highlight))
+            self.dataChanged.emit(
+                    self.index(self.last_highlight), self.index(self.last_highlight))
         self._things[idx]._highlight = True
         self.dataChanged.emit(self.index(idx), self.index(idx))
         self.last_highlight = idx
@@ -134,7 +135,7 @@ class MainWin(QtCore.QObject):
         self.start_player()
 
     def pause_clicked(self):
-        self.main_win.rootObject().pause()
+        self.root_obj.pause()
 
     def player_duration(self, duration):
         self.duration = duration
@@ -154,12 +155,13 @@ class MainWin(QtCore.QObject):
 
     @QtCore.pyqtSlot(QtCore.QObject)
     def station_clicked(self, station):
-        idx = self.main_win.rootObject().currentStation()
+        idx = self.root_obj.currentStation()
         self.fav_model.set_highlight(idx)
 
         _station = station._station
-        self.set_status("Listening to radio %s (%s)" % (_station['radio_id'], _station['object_id']))
-        self.current_station = station
+        self.set_status("Listening to radio %s (%s)" % (
+            _station['radio_id'], _station['object_id']))
+        self.current_station = _station
         self.mode = "station"
 
         radio_id = _station['radio_id']
@@ -170,12 +172,11 @@ class MainWin(QtCore.QObject):
 
     def fetch_from_station(self, station):
         try:
-            tracks = radio.get_radio_list(self.state, self.state['radio_type'], self.state['radio_id'])
+            tracks = radio.get_radio_list(self.state,
+                    self.state['radio_type'], self.state['radio_id'])
         except:
             logger.exception("fail to get list of songs")
             return
-#        if self.state['random']:
-#            random.shuffle(tracks)
 
         for track in tracks:
             self.add_track(track)
@@ -307,22 +308,22 @@ class MainWin(QtCore.QObject):
         self.main_win.show()
 
         # Connect signals
-        root_obj = self.main_win.rootObject()
-        root_obj.guessClicked.connect(self.guess_clicked)
-        root_obj.randomGuessClicked.connect(self.random_guess_clicked)
-        root_obj.loadFavClicked.connect(self.load_fav_clicked)
-        root_obj.playerStopped.connect(self.player_stopped)
-        root_obj.nextClicked.connect(self.next_clicked)
-        root_obj.prevClicked.connect(self.prev_clicked)
-        root_obj.pauseClicked.connect(self.pause_clicked)
-        root_obj.playerPosition.connect(self.player_position)
-        root_obj.playerStatus.connect(self.player_status)
+        self.root_obj = self.main_win.rootObject()
+        self.root_obj.guessClicked.connect(self.guess_clicked)
+        self.root_obj.randomGuessClicked.connect(self.random_guess_clicked)
+        self.root_obj.loadFavClicked.connect(self.load_fav_clicked)
+        self.root_obj.playerStopped.connect(self.player_stopped)
+        self.root_obj.nextClicked.connect(self.next_clicked)
+        self.root_obj.prevClicked.connect(self.prev_clicked)
+        self.root_obj.pauseClicked.connect(self.pause_clicked)
+        self.root_obj.playerPosition.connect(self.player_position)
+        self.root_obj.playerStatus.connect(self.player_status)
 
         self.fav_model = ThingsModel([])
         self.playlist_model = ThingsModel([])
-        fav_list = root_obj.findChild(QObject, "favStations")
+        fav_list = self.root_obj.findChild(QObject, "favStations")
         fav_list.setProperty("model", self.fav_model)
-        playlist_list = root_obj.findChild(QObject, "playlist")
+        playlist_list = self.root_obj.findChild(QObject, "playlist")
         playlist_list.setProperty("model", self.playlist_model)
         self.play_idx = 0
 
