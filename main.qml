@@ -179,12 +179,15 @@ Rectangle {
         anchors.left: parent.left
         anchors.leftMargin: 8
 
-        ListView {
-            id: playlist
-            objectName: "playlist"
+        ScrollView {
             anchors.fill: parent
-            model: ListModel{}
-            delegate: songDelegate
+            ListView {
+                id: playlist
+                objectName: "playlist"
+                anchors.fill: parent
+                model: ListModel{}
+                delegate: songDelegate
+            }
         }
     }
 
@@ -305,12 +308,15 @@ Rectangle {
         anchors.right: parent.right
         anchors.rightMargin: 8
 
-        ListView {
-            id: favStations
-            objectName: "favStations"
+        ScrollView {
             anchors.fill: parent
-            model: ListModel {}
-            delegate: stationDelegate
+            ListView {
+                id: favStations
+                objectName: "favStations"
+                anchors.fill: parent
+                model: ListModel {}
+                delegate: stationDelegate
+            }
         }
     }
 
