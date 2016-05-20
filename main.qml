@@ -131,26 +131,28 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.topMargin: 3
             }
-            Text {
-                id: songTitle
-                text: model.display.title
-                width: songCell.width
-                font.bold: true
-                wrapMode: TextEdit.Wrap
+            Rectangle {
+                id: songInfo
                 anchors.left: songImage.right
                 anchors.leftMargin: 8
-                anchors.top: parent.top
-                anchors.topMargin: 3
-            }
-            Text {
-                id: songDesc
-                text: model.display.desc
-                width: songCell.width
-                anchors.left: songTitle.left
-                anchors.leftMargin: 0
-                anchors.top: songTitle.bottom
-                anchors.topMargin: 0
-                wrapMode: TextEdit.Wrap
+                width: parent.width - songImage.width - 8 - 3
+                Text {
+                    id: songTitle
+                    text: model.display.title
+                    width: parent.width
+                    font.bold: true
+                    wrapMode: TextEdit.Wrap
+                    anchors.top: parent.top
+                    anchors.topMargin: 3
+                }
+                Text {
+                    id: songDesc
+                    text: model.display.desc
+                    width: parent.width
+                    anchors.top: songTitle.bottom
+                    anchors.topMargin: 0
+                    wrapMode: TextEdit.Wrap
+                }
             }
             MouseArea {
                 anchors.fill: parent
