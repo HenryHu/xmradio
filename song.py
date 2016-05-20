@@ -169,6 +169,9 @@ class Song(object):
 
         my_info = song_info['data']['trackList'][0]
         self.__init__(my_info)
+        if hasattr(self, 'songName'):
+            # for some reason, title = album_name
+            self.title = self.songName
 
     def load_info_from_page(self):
         ''' Load info of this song, index by song_id (deprecated)'''
