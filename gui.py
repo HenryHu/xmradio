@@ -58,12 +58,16 @@ class SongWrapper(QtCore.QObject):
         unescaper = HTMLParser.HTMLParser()
         return unescaper.unescape("from %s #%s" % (self._track.album_name, self._track.song_id))
 
+    def _image_url(self):
+        return self._track.pic
+
     def _highlight(self):
         return self._highlight
 
     changed = QtCore.pyqtSignal()
     title = QtCore.pyqtProperty(unicode, _title, notify=changed)
     desc = QtCore.pyqtProperty(unicode, _desc, notify=changed)
+    image_url = QtCore.pyqtProperty(unicode, _image_url, notify=changed)
     highlight = QtCore.pyqtProperty(bool, _highlight, notify=changed)
 
 class ThingsModel(QtCore.QAbstractListModel):

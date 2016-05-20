@@ -122,19 +122,32 @@ Rectangle {
                     return "white"
                 }
             }
-
+            Image {
+                id: songImage
+                source: model.display.image_url
+                height: parent.height
+                width: height
+                anchors.left: parent.left
+                anchors.leftMargin: 3
+                anchors.top: parent.top
+                anchors.topMargin: 3
+            }
             Text {
                 id: songTitle
                 text: model.display.title
                 width: songCell.width
                 font.bold: true
                 wrapMode: TextEdit.Wrap
+                anchors.left: songImage.right
+                anchors.leftMargin: 8
+                anchors.top: parent.top
+                anchors.topMargin: 3
             }
             Text {
                 id: songDesc
                 text: model.display.desc
                 width: songCell.width
-                anchors.left: parent.left
+                anchors.left: songTitle.left
                 anchors.leftMargin: 0
                 anchors.top: songTitle.bottom
                 anchors.topMargin: 0
