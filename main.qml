@@ -14,6 +14,7 @@ Rectangle {
     signal prevClicked()
     signal loadFavClicked()
     signal loadPlaylistClicked()
+    signal savePlaylistClicked()
     signal playerError(string error, string errorString)
     signal playerStopped()
     signal playerPosition(int position)
@@ -222,6 +223,16 @@ Rectangle {
         anchors.leftMargin: 8
         onClicked: loadPlaylistClicked()
     }
+
+    Button {
+        id: btnSavePlaylist
+        text: qsTr("Save playlist")
+        anchors.verticalCenter: btnGuess.verticalCenter
+        anchors.left: btnLoadPlaylist.right
+        anchors.leftMargin: 8
+        onClicked: savePlaylistClicked()
+    }
+
 
     Button {
         id: btnPause

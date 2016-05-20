@@ -103,7 +103,7 @@ class ThingsModel(QtCore.QAbstractListModel):
             self._things[self.last_highlight]._highlight = False
             self.dataChanged.emit(
                     self.index(self.last_highlight), self.index(self.last_highlight))
-        if idx != -1:
+        if idx != -1 and idx < len(self._things):
             self._things[idx]._highlight = True
             self.dataChanged.emit(self.index(idx), self.index(idx))
         self.last_highlight = idx
@@ -167,9 +167,19 @@ class MainWin(QtCore.QObject):
         for i in xrange(my_playlist.count()):
             track = my_playlist.get(i)
             self.add_track(track)
+        self.set_status("Playlist loaded from %s" % filename)
 
         self.mode = 'local_playlist'
         self.start_player()
+
+    def save_playlist_clicked(self):
+        filename = "playlist.txt"
+        new_playlist = localplaylist.LocalPlaylist()
+        for i in xrange(self.playlist_count()):
+            track = self.playlist_model.get(i)
+            new_playlist.insert(track._track)
+        new_playlist.save(filename)
+        self.set_status("Playlist saved to %s" % filename)
 
     def clear_playlist(self):
         self.playlist_model.clear()
@@ -217,6 +227,9 @@ class MainWin(QtCore.QObject):
         self.playlist_model.append(SongWrapper(track))
 
     def start_player(self):
+        if self.play_idx >= self.playlist_count():
+            self.set_status("No song to play, can't find song %d" % self.play_idx)
+            return
         self.playlist_model.set_highlight(self.play_idx)
         self.main_win.rootObject().setCurrentSong(self.play_idx)
         track = self.playlist_model.get(self.play_idx)._track
@@ -340,6 +353,7 @@ class MainWin(QtCore.QObject):
         self.root_obj.randomGuessClicked.connect(self.random_guess_clicked)
         self.root_obj.loadFavClicked.connect(self.load_fav_clicked)
         self.root_obj.loadPlaylistClicked.connect(self.load_playlist_clicked)
+        self.root_obj.savePlaylistClicked.connect(self.save_playlist_clicked)
         self.root_obj.playerStopped.connect(self.player_stopped)
         self.root_obj.nextClicked.connect(self.next_clicked)
         self.root_obj.prevClicked.connect(self.prev_clicked)

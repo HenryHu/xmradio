@@ -1,6 +1,7 @@
 import song
 import logging
 import os
+import codecs
 
 class LocalPlaylist(object):
     def __init__(self):
@@ -11,6 +12,9 @@ class LocalPlaylist(object):
             line = inf.readline()
 
             while line:
+                if '#' in line:
+                    line = line.split('#', 1)[0]
+                line = line.strip()
                 try:
                     song_id = int(line)
                     song_info = {'song_id': str(song_id)}
@@ -21,12 +25,16 @@ class LocalPlaylist(object):
 
                 line = inf.readline()
 
+        if len(self.items) == 0:
+            if os.path.exists(filename + os.extsep + "old"):
+                self.load(filename + os.extsep + "old")
+
     def save(self, filename):
         if os.path.exists(filename):
             os.rename(filename, filename + os.extsep + "old")
-        with open(filename, 'w') as outf:
+        with codecs.open(filename, 'w', 'utf-8') as outf:
             for track in self.items:
-                outf.write("%s\n" % (track.song_id))
+                outf.write(u"{id} # {title} by {artist}\n".format(id=track.song_id, title=track.title, artist=track.artist))
 
     def count(self):
         return len(self.items)
