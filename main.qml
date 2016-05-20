@@ -13,6 +13,7 @@ Rectangle {
     signal nextClicked()
     signal prevClicked()
     signal loadFavClicked()
+    signal loadPlaylistClicked()
     signal playerError(string error, string errorString)
     signal playerStopped()
     signal playerPosition(int position)
@@ -59,9 +60,6 @@ Rectangle {
 
     function getPlayerStatus() {
         return player.status
-    }
-
-    function setPlaylistHighlight(pos) {
     }
 
     function currentStation() {
@@ -125,7 +123,7 @@ Rectangle {
             Image {
                 id: songImage
                 source: model.display.image_url
-                height: parent.height
+                height: parent.height - 6
                 width: height
                 anchors.left: parent.left
                 anchors.leftMargin: 3
@@ -216,6 +214,14 @@ Rectangle {
         onClicked: loadFavClicked()
     }
 
+    Button {
+        id: btnLoadPlaylist
+        text: qsTr("Load playlist")
+        anchors.verticalCenter: btnGuess.verticalCenter
+        anchors.left: btnLoadFav.right
+        anchors.leftMargin: 8
+        onClicked: loadPlaylistClicked()
+    }
 
     Button {
         id: btnPause

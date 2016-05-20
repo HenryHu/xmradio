@@ -8,6 +8,7 @@ import time
 import os
 import logging
 import playlist
+import localplaylist
 import HTMLParser
 import random
 from functools import partial
@@ -154,6 +155,21 @@ class MainWin(QtCore.QObject):
 
         for fav_radio in fav_radios:
             self.fav_model.append(StationWrapper(fav_radio))
+
+    def load_playlist_clicked(self):
+        filename = "playlist.txt"
+        my_playlist = localplaylist.LocalPlaylist()
+        my_playlist.load(filename)
+        self.state['player_path'] = playlist.player_path
+
+        self.fav_model.set_highlight(-1)
+        self.clear_playlist()
+        for i in xrange(my_playlist.count()):
+            track = my_playlist.get(i)
+            self.add_track(track)
+
+        self.mode = 'local_playlist'
+        self.start_player()
 
     def clear_playlist(self):
         self.playlist_model.clear()
@@ -323,6 +339,7 @@ class MainWin(QtCore.QObject):
         self.root_obj.guessClicked.connect(self.guess_clicked)
         self.root_obj.randomGuessClicked.connect(self.random_guess_clicked)
         self.root_obj.loadFavClicked.connect(self.load_fav_clicked)
+        self.root_obj.loadPlaylistClicked.connect(self.load_playlist_clicked)
         self.root_obj.playerStopped.connect(self.player_stopped)
         self.root_obj.nextClicked.connect(self.next_clicked)
         self.root_obj.prevClicked.connect(self.prev_clicked)
@@ -346,6 +363,7 @@ class MainWin(QtCore.QObject):
         self.duration = 0
         self.position = 0
         self.current_station = None
+        self.mode = 'stopped'
 
         app.exec_()
 
