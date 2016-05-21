@@ -23,6 +23,7 @@ Rectangle {
     signal progressSeek(real x, real width)
     signal songClicked(var item, int index)
     signal stationClicked(var item, int index)
+    signal exitClicked()
 
     function setStatus(statusText) {
         status.text = statusText
@@ -244,6 +245,14 @@ Rectangle {
         onClicked: savePlaylistClicked()
     }
 
+    Button {
+        id: btnExit
+        text: qsTr("Exit")
+        anchors.verticalCenter: btnGuess.verticalCenter
+        anchors.right: parent.right
+        anchors.rightMargin: 8
+        onClicked: exitClicked()
+    }
 
     Button {
         id: btnPause

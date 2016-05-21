@@ -87,6 +87,11 @@
         <translation>保存播放列表</translation>
     </message>
     <message>
+        <location filename="../main.qml" line="250"/>
+        <source>Exit</source>
+        <translation>退出</translation>
+    </message>
+    <message>
         <location filename="../main.qml" line="251"/>
         <source>Pause/Resume</source>
         <translation>暂停/恢复</translation>

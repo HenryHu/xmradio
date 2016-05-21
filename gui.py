@@ -359,6 +359,9 @@ class MainWin(QtCore.QObject):
     def set_status(self, status):
         self.main_win.rootObject().setStatus(status)
 
+    def exit_clicked(self):
+        sys.exit(0)
+
     # tray functions
     def tray_exit_clicked(self):
         sys.exit(0)
@@ -401,6 +404,7 @@ class MainWin(QtCore.QObject):
         self.root_obj.songClicked.connect(self.song_clicked)
         self.root_obj.stationClicked.connect(self.station_clicked)
         self.root_obj.playerError.connect(self.player_error)
+        self.root_obj.exitClicked.connect(self.exit_clicked)
 
         self.fav_model = ThingsModel([])
         self.playlist_model = ThingsModel([])
