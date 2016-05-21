@@ -345,6 +345,10 @@ class MainWin(QtCore.QObject):
         self.position = position
         self.update_position()
 
+    def player_error(self, error, error_str):
+        print(error)
+        print(error_str)
+
     def record_play(self, track, playtype="10"):
         # type 10 -> play from radio
         try:
@@ -355,6 +359,7 @@ class MainWin(QtCore.QObject):
     def set_status(self, status):
         self.main_win.rootObject().setStatus(status)
 
+    # tray functions
     def tray_exit_clicked(self):
         sys.exit(0)
 
@@ -395,6 +400,7 @@ class MainWin(QtCore.QObject):
         self.root_obj.progressSeek.connect(self.progress_seek)
         self.root_obj.songClicked.connect(self.song_clicked)
         self.root_obj.stationClicked.connect(self.station_clicked)
+        self.root_obj.playerError.connect(self.player_error)
 
         self.fav_model = ThingsModel([])
         self.playlist_model = ThingsModel([])

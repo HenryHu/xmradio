@@ -103,8 +103,10 @@ class Song(object):
         if not hasattr(self, 'song_id'):
             raise Exception("missing song id")
 
-        if hasattr(self, 'hq_location'):
-            return self.hq_location
+        # hq_location should not be cached
+        # they will timeout after a certain time
+#        if hasattr(self, 'hq_location'):
+#            return self.hq_location
 
         get_hq_url = get_hq_url_temp % self.song_id
         logger.debug("get hq req: %s" % get_hq_url)
@@ -122,6 +124,7 @@ class Song(object):
         if not 'status' in get_hq_parsed or get_hq_parsed['status'] != 1:
             raise Exception("fail to get hq url. status = %d" % get_hq_parsed['status'])
 
+        # should not be reused; timeout after a while
         self.hq_location = decrypt_location(get_hq_parsed['location'])
         return self.hq_location
 

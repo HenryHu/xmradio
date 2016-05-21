@@ -15,7 +15,7 @@ Rectangle {
     signal loadFavClicked()
     signal loadPlaylistClicked()
     signal savePlaylistClicked()
-    signal playerError(string error, string errorString)
+    signal playerError(var error, string errorString)
     signal playerStopped()
     signal playerPosition(int position)
     signal playerDuration(int duration)
