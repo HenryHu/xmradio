@@ -20,6 +20,7 @@ Dependencies:
 * QtMultimedia It uses the MediaPlayer widget in QtQuick for playback
 * gstreamer1 For audio playback, used by QtMultimedia
 * gstreamer-neon  For streaming HTTP audio
+
 ### install the following packages
 * Ubuntu / Debian:
 `gstreamer1.0-plugins-good gstreamer-plugins-base gstreamer1.0-pluseaudio libgstreamer-plugins-bad1.0-0 libqt5gstreamer-1.0-0 python-pyqt5 python-pyqt5.qtmultimedia python-pyqt5.qtquick`
