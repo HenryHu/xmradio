@@ -1,6 +1,6 @@
 #!/bin/sh
 
-QMLS=../main.qml
+QMLS="../main.qml ../login.qml"
 PYS=../gui.py
 
 echo "Updating qml"

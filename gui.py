@@ -113,14 +113,11 @@ class ThingsModel(QtCore.QAbstractListModel):
         self.modelReset.emit()
         self.last_highlight = idx
 
-def authenticate(state):
-    if not info.authenticated(state):
-        username = raw_input("username: ")
-        import getpass
-        password = getpass.getpass("password: ")
-        login.login_console(state, username, password)
-
 class MainWin(QtCore.QObject):
+    def __init__(self, state):
+        QtCore.QObject.__init__(self)
+        self.state = state
+
     def guess_clicked(self):
         self.mode = "guess"
         self.guess_and_play()
@@ -343,17 +340,7 @@ class MainWin(QtCore.QObject):
     def set_status(self, status):
         self.main_win.rootObject().setStatus(status)
 
-    def main(self):
-        self.state = init.init()
-        authenticate(self.state)
-
-        app = QGuiApplication(sys.argv)
-
-        qt_translator = QtCore.QTranslator()
-        qt_translator.load("xmradio_%s" % QtCore.QLocale().name(), "lang")
-        app.installTranslator(qt_translator)
-        qt_translator
-
+    def create(self):
         # Create the QML user interface.
         self.main_win = QQuickView()
         self.main_win.setTitle(self.tr("Xiami Player"))
@@ -395,9 +382,90 @@ class MainWin(QtCore.QObject):
         self.current_station = None
         self.mode = 'stopped'
 
-        app.exec_()
+class LoginWin(QtCore.QObject):
+    def __init__(self, state, app):
+        QtCore.QObject.__init__(self)
+        self.state = state
+        self.app = app
+
+        # Create the QML user interface.
+        self.login_win = QQuickView()
+        self.login_win.setTitle(self.tr("Xiami Login"))
+        self.login_win.setSource(QUrl('login.qml'))
+        self.login_win.setResizeMode(QQuickView.SizeRootObjectToView)
+        self.login_win.show()
+
+        # Connect signals
+        self.root_obj = self.login_win.rootObject()
+        self.root_obj.loginClicked.connect(self.login_clicked)
+        self.root_obj.exitClicked.connect(self.exit_clicked)
+
+    def set_state(self, msg):
+        self.root_obj.setStatus(msg)
+
+    def exit_clicked(self):
+        sys.exit(0)
+
+    def login_clicked(self, username, password):
+        code = self.root_obj.getVerificationCode()
+        if code != "":
+            try:
+                login.login_with_code(self.state, self.key, code)
+            except Exception as e:
+                self.set_state(e.message)
+                self.root_obj.hideCode()
+                return
+            self.ok()
+        else:
+            try:
+                ret = login.login(self.state, username, password)
+            except Exception as e:
+                print(e.message)
+                self.set_state(e.message)
+                return
+            if not ret[0]:
+                with open(login.img_path, 'wb') as imgf:
+                    imgf.write(ret[2])
+                self.set_state(self.tr("Please enter verification code"))
+                self.root_obj.setVerificationImage("file://%s" % login.img_path)
+                self.key = ret[1]
+            else:
+                self.ok()
+
+    def ok(self):
+        self.login_win.close()
+        self.app.auth_ok()
+
+class XiamiPlayer(QtCore.QObject):
+    def main(self):
+        self.running = False
+        self.state = init.init()
+
+        self.app = QGuiApplication(sys.argv)
+
+        qt_translator = QtCore.QTranslator()
+        qt_translator.load("xmradio_%s" % QtCore.QLocale().name(), "lang")
+        self.app.installTranslator(qt_translator)
+
+        self.authenticate()
+
+    def auth_ok(self):
+        self.main_win = MainWin(self.state)
+        self.main_win.create()
+        self.run()
+
+    def run(self):
+        if not self.running:
+            self.running = True
+            self.app.exec_()
+
+    def authenticate(self):
+        if not info.authenticated(self.state):
+            self.login_win = LoginWin(self.state, self)
+            self.run()
+        self.auth_ok()
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.WARN)
-    main_win = MainWin()
-    main_win.main()
+    main_app = XiamiPlayer()
+    main_app.main()

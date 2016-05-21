@@ -77,9 +77,9 @@ def login_with_code(state, post_args, code):
 
     # check result
     if not login_ret_parsed['status']:
-        print(login_ret_parsed)
+        logger.debug(login_ret_parsed)
         if 'message' in login_ret_parsed:
-            print(login_ret_parsed['message'])
+            logger.debug(login_ret_parsed['message'])
             raise Exception(login_ret_parsed['message'])
         else:
             raise Exception('login failed')

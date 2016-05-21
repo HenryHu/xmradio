@@ -2,6 +2,54 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
+    <name>login</name>
+    <message>
+        <location filename="../login.qml" line="42"/>
+        <source>Please login</source>
+        <translation>请登录</translation>
+    </message>
+    <message>
+        <location filename="../login.qml" line="52"/>
+        <source>Ready</source>
+        <translation>Ready</translation>
+    </message>
+    <message>
+        <location filename="../login.qml" line="70"/>
+        <source>Username:</source>
+        <translation>用户名:</translation>
+    </message>
+    <message>
+        <location filename="../login.qml" line="86"/>
+        <source>Password:</source>
+        <translation>密码:</translation>
+    </message>
+    <message>
+        <location filename="../login.qml" line="115"/>
+        <source>Login</source>
+        <translation>登录</translation>
+    </message>
+    <message>
+        <location filename="../login.qml" line="123"/>
+        <source>Exit</source>
+        <translation>退出</translation>
+    </message>
+    <message>
+        <location filename="../login.qml" line="132"/>
+        <source>Code:</source>
+        <translation>验证码:</translation>
+    </message>
+    <message>
+        <location filename="../login.qml" line="140"/>
+        <source>Code</source>
+        <translation>验证码</translation>
+    </message>
+    <message>
+        <location filename="../login.qml" line="140"/>
+        <source>Text Field</source>
+        <translation>验证码</translation>
+    </message>
+</context>
+<context>
     <name>main</name>
     <message>
         <location filename="../main.qml" line="96"/>
@@ -52,6 +100,19 @@
         <location filename="../main.qml" line="343"/>
         <source>Prev</source>
         <translation>上一首</translation>
+    </message>
+</context>
+<context>
+    <name>LoginWin</name>
+    <message>
+        <location filename="../gui.py" line="393"/>
+        <source>Xiami Login</source>
+        <translation>虾米登录</translation>
+    </message>
+    <message>
+        <location filename="../gui.py" line="429"/>
+        <source>Please enter verification code</source>
+        <translation>请输入验证码</translation>
     </message>
 </context>
 <context>
