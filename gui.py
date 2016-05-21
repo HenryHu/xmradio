@@ -31,7 +31,7 @@ class StationWrapper(QtCore.QObject):
 
     def _title(self):
         unescaper = HTMLParser.HTMLParser()
-        return "%s fav by %s" % (unescaper.unescape(self._station['radio_name']), self._station['fav_count'])
+        return self.tr("%s fav by %s") % (unescaper.unescape(self._station['radio_name']), self._station['fav_count'])
 
     def _desc(self):
         unescaper = HTMLParser.HTMLParser()
@@ -53,11 +53,11 @@ class SongWrapper(QtCore.QObject):
 
     def _title(self):
         unescaper = HTMLParser.HTMLParser()
-        return unescaper.unescape("%s by %s" % (self._track.title, self._track.artist))
+        return unescaper.unescape(self.tr("%s by %s") % (self._track.title, self._track.artist))
 
     def _desc(self):
         unescaper = HTMLParser.HTMLParser()
-        return unescaper.unescape("from %s #%s" % (self._track.album_name, self._track.song_id))
+        return unescaper.unescape(self.tr("from %s #%s") % (self._track.album_name, self._track.song_id))
 
     def _image_url(self):
         return self._track.pic
@@ -167,7 +167,7 @@ class MainWin(QtCore.QObject):
         for i in xrange(my_playlist.count()):
             track = my_playlist.get(i)
             self.add_track(track)
-        self.set_status("Playlist loaded from %s" % filename)
+        self.set_status(self.tr("Playlist loaded from %s") % filename)
 
         self.mode = 'local_playlist'
         self.start_player()
@@ -179,7 +179,7 @@ class MainWin(QtCore.QObject):
             track = self.playlist_model.get(i)
             new_playlist.insert(track._track)
         new_playlist.save(filename)
-        self.set_status("Playlist saved to %s" % filename)
+        self.set_status(self.tr("Playlist saved to %s") % filename)
 
     def clear_playlist(self):
         self.playlist_model.clear()
@@ -189,7 +189,7 @@ class MainWin(QtCore.QObject):
         self.fav_model.set_highlight(idx)
 
         _station = station._station
-        self.set_status("Listening to radio %s (%s)" % (
+        self.set_status(self.tr("Listening to radio %s (%s)") % (
             _station['radio_id'], _station['object_id']))
         self.current_station = _station
         self.mode = "station"
@@ -224,7 +224,7 @@ class MainWin(QtCore.QObject):
 
     def start_player(self):
         if self.play_idx >= self.playlist_count():
-            self.set_status("No song to play, can't find song %d" % self.play_idx)
+            self.set_status(self.tr("No song to play, can't find song %d") % self.play_idx)
             return
         self.playlist_model.set_highlight(self.play_idx)
         self.main_win.rootObject().setCurrentSong(self.play_idx)
@@ -240,7 +240,7 @@ class MainWin(QtCore.QObject):
         else:
             url = track.location
 
-        self.set_status("Listening to: %s by %s from album %s%s #%s" % (track.title, track.artist, track.album_name, " [HQ]" if is_hq else "", track.song_id))
+        self.set_status(self.tr("Listening to: %s by %s from album %s%s #%s") % (track.title, track.artist, track.album_name, self.tr(" [HQ]") if is_hq else "", track.song_id))
         if track.length:
             # missing? whatever...
             self.duration = int(track.length) * 1000
@@ -338,7 +338,7 @@ class MainWin(QtCore.QObject):
 
         # Create the QML user interface.
         self.main_win = QQuickView()
-        self.main_win.setTitle("Xiami Player")
+        self.main_win.setTitle(self.tr("Xiami Player"))
         self.main_win.setSource(QUrl('main.qml'))
         self.main_win.setResizeMode(QQuickView.SizeRootObjectToView)
         self.main_win.show()
@@ -367,7 +367,7 @@ class MainWin(QtCore.QObject):
         playlist_list = self.root_obj.findChild(QObject, "playlist")
         playlist_list.setProperty("model", self.playlist_model)
 
-        self.set_status("Ready")
+        self.set_status(self.tr("Ready"))
 #        rc = self.main_win.rootContext()
 #        rc.setContextProperty("controller", self)
 
