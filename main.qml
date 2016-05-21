@@ -130,12 +130,12 @@ Rectangle {
             Image {
                 id: songImage
                 source: model.display.image_url
-                height: 36
-                width: 36
+                height: 32
+                width: 32
                 anchors.left: parent.left
-                anchors.leftMargin: 3
+                anchors.leftMargin: 2
                 anchors.top: parent.top
-                anchors.topMargin: 3
+                anchors.topMargin: 2
             }
             Rectangle {
                 id: songInfo
