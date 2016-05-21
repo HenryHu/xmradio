@@ -424,6 +424,8 @@ class MainWin(QtCore.QObject):
             self.playlist_paste()
         elif key == ord('C') and modifiers == QtCore.Qt.ControlModifier:
             self.playlist_copy()
+        elif key == ord('Q') and modifiers == QtCore.Qt.ControlModifier:
+            self.exit_clicked()
 
     def time_ms_to_str(self, time_ms):
         time_s = int(time_ms / 1000)
