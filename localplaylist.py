@@ -3,6 +3,8 @@ import logging
 import os
 import codecs
 
+logger = logging.getLogger("localplaylist")
+
 class LocalPlaylist(object):
     def __init__(self):
         self.items = []
@@ -16,11 +18,10 @@ class LocalPlaylist(object):
                     line = line.split('#', 1)[0]
                 line = line.strip()
                 try:
-                    song_id = int(line)
-                    track = song.Song.from_id(song_info)
+                    track = song.Song.from_id(int(line))
                     self.items += [track]
                 except:
-                    pass
+                    logger.exception("line %s error(%s)" % (line, filename))
 
                 line = inf.readline()
 
@@ -43,7 +44,7 @@ class LocalPlaylist(object):
         try:
             track.load_info()
         except:
-            logging.exception("error loading info")
+            logger.exception("error loading info")
         return track
 
     def insert(self, track, idx = 0):
