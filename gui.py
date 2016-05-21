@@ -133,6 +133,7 @@ class MainWin(QtCore.QObject):
         self.state = state
         self.app = app
 
+    # guess-related
     def guess_clicked(self):
         self.mode = "guess"
         self.guess_and_play()
@@ -150,6 +151,7 @@ class MainWin(QtCore.QObject):
         self.mode = "random_guess"
         self.guess_and_play()
 
+    # player control
     def next_clicked(self):
         self.proper_next()
 
@@ -160,18 +162,11 @@ class MainWin(QtCore.QObject):
     def pause_clicked(self):
         self.root_obj.pause()
 
-    def player_duration(self, duration):
-        self.duration = duration
-        self.progress = 0
-        self.update_position()
+    def progress_seek(self, x, width):
+        if self.duration != 0:
+            self.root_obj.seek(x * self.duration / width)
 
-    def load_fav_clicked(self):
-        fav_radio_page = 1
-        fav_radios = radio.get_fav_radio(self.state, fav_radio_page)
-
-        for fav_radio in fav_radios:
-            self.fav_model.append(StationWrapper(fav_radio))
-
+    # local playlist handling
     def load_playlist_clicked(self):
         filename = "playlist.txt"
         my_playlist = localplaylist.LocalPlaylist()
@@ -201,6 +196,14 @@ class MainWin(QtCore.QObject):
         self.playlist_model.clear()
         self.play_idx = 0
 
+    # stations
+    def load_fav_clicked(self):
+        fav_radio_page = 1
+        fav_radios = radio.get_fav_radio(self.state, fav_radio_page)
+
+        for fav_radio in fav_radios:
+            self.fav_model.append(StationWrapper(fav_radio))
+
     def station_clicked(self, station, idx):
         self.fav_model.set_highlight(idx)
 
@@ -227,13 +230,10 @@ class MainWin(QtCore.QObject):
         for track in tracks:
             self.add_track(track)
 
+    # playlist
     def song_clicked(self, song, idx):
         self.play_idx = idx
         self.start_player()
-
-    def progress_seek(self, x, width):
-        if self.duration != 0:
-            self.root_obj.seek(x * self.duration / width)
 
     def add_track(self, track):
         self.playlist_model.append(SongWrapper(track))
@@ -285,23 +285,6 @@ class MainWin(QtCore.QObject):
         if self.playlist_count() == 0: return
         self.play_idx = (self.play_idx + 1) % self.playlist_count()
 
-    def time_ms_to_str(self, time_ms):
-        time_s = int(time_ms / 1000)
-        time_h = time_s / 3600
-        time_s = time_s % 3600
-        time_m = time_s / 60
-        time_s = time_s % 60
-        if time_h > 0:
-            return "%02d:%02d:%02d" % (time_h, time_m, time_s)
-        else:
-            return "%02d:%02d" % (time_m, time_s)
-
-    def update_position(self):
-        cur_pos = self.time_ms_to_str(self.position)
-        max_pos = self.time_ms_to_str(self.duration)
-        msg = "%s (%s)" % (cur_pos, max_pos)
-        self.main_win.rootObject().setProgress(self.duration, self.position, msg)
-
     def move_to_random(self):
         self.play_idx = random.randint(0, self.playlist_count() - 1)
 
@@ -325,6 +308,12 @@ class MainWin(QtCore.QObject):
             else:
                 self.move_to_next()
         self.start_player()
+
+    # player event handling
+    def player_duration(self, duration):
+        self.duration = duration
+        self.progress = 0
+        self.update_position()
 
     def player_stopped(self):
         pass
@@ -355,6 +344,24 @@ class MainWin(QtCore.QObject):
             info.record_play(self.state, track.song_id, None, info.is_vip(self.state), playtype)
         except:
             logger.exception("fail to record")
+
+    # misc
+    def time_ms_to_str(self, time_ms):
+        time_s = int(time_ms / 1000)
+        time_h = time_s / 3600
+        time_s = time_s % 3600
+        time_m = time_s / 60
+        time_s = time_s % 60
+        if time_h > 0:
+            return "%02d:%02d:%02d" % (time_h, time_m, time_s)
+        else:
+            return "%02d:%02d" % (time_m, time_s)
+
+    def update_position(self):
+        cur_pos = self.time_ms_to_str(self.position)
+        max_pos = self.time_ms_to_str(self.duration)
+        msg = "%s (%s)" % (cur_pos, max_pos)
+        self.main_win.rootObject().setProgress(self.duration, self.position, msg)
 
     def set_status(self, status):
         self.main_win.rootObject().setStatus(status)
