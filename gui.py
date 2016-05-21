@@ -49,7 +49,7 @@ class SongWrapper(QtCore.QObject):
     def __init__(self, track):
         QtCore.QObject.__init__(self)
         self._track = track
-        self._highlight = False
+        self.is_highlight = False
 
     def _title(self):
         unescaper = HTMLParser.HTMLParser()
@@ -63,7 +63,7 @@ class SongWrapper(QtCore.QObject):
         return self._track.pic
 
     def _highlight(self):
-        return self._highlight
+        return self.is_highlight
 
     changed = QtCore.pyqtSignal()
     title = QtCore.pyqtProperty(unicode, _title, notify=changed)
@@ -100,12 +100,17 @@ class ThingsModel(QtCore.QAbstractListModel):
 
     def set_highlight(self, idx):
         if self.last_highlight != -1 and self.last_highlight < len(self._things):
-            self._things[self.last_highlight]._highlight = False
+            self._things[self.last_highlight].is_highlight = False
+            self._things[self.last_highlight].changed.emit()
+            # does not work
             self.dataChanged.emit(
                     self.index(self.last_highlight), self.index(self.last_highlight))
         if idx != -1 and idx < len(self._things):
-            self._things[idx]._highlight = True
-            self.dataChanged.emit(self.index(idx), self.index(idx))
+            self._things[idx].is_highlight = True
+            # does not work
+            self.dataChanged.emit(self.index(0), self.index(self.rowCount()))
+        # should not need this, but dataChanged has no effect
+        self.modelReset.emit()
         self.last_highlight = idx
 
 def authenticate(state):
@@ -135,7 +140,6 @@ class MainWin(QtCore.QObject):
 
     def next_clicked(self):
         self.proper_next()
-        self.start_player()
 
     def prev_clicked(self):
         self.move_to_prev()
@@ -224,7 +228,11 @@ class MainWin(QtCore.QObject):
 
     def start_player(self):
         if self.play_idx >= self.playlist_count():
-            self.set_status(self.tr("No song to play, can't find song %d") % self.play_idx)
+            if self.playlist_count() == 0:
+                self.set_status(self.tr("Playlist empty"))
+            else:
+                self.set_status(
+                        self.tr("No song to play, can't find song %d") % self.play_idx)
             return
         self.playlist_model.set_highlight(self.play_idx)
         self.main_win.rootObject().setCurrentSong(self.play_idx)
@@ -234,13 +242,18 @@ class MainWin(QtCore.QObject):
             try:
                 url = track.get_hq_location(self.state)
             except Exception as e:
-                logger.warning("WARNING: error occoured when fetching high quality source: %r" % e)
+                logger.warning(
+                        "WARNING: error occoured when fetching high quality source: %r"
+                        % e)
                 url = track.location
                 is_hq = False
         else:
             url = track.location
 
-        self.set_status(self.tr("Listening to: %s by %s from album %s%s #%s") % (track.title, track.artist, track.album_name, self.tr(" [HQ]") if is_hq else "", track.song_id))
+        self.set_status(
+                self.tr("Listening to: %s by %s from album %s%s #%s") %
+                (track.title, track.artist, track.album_name,
+                    self.tr(" [HQ]") if is_hq else "", track.song_id))
         if track.length:
             # missing? whatever...
             self.duration = int(track.length) * 1000
@@ -253,9 +266,11 @@ class MainWin(QtCore.QObject):
         return self.playlist_model.rowCount()
 
     def move_to_prev(self):
+        if self.playlist_count() == 0: return
         self.play_idx = (self.play_idx - 1 + self.playlist_count()) % self.playlist_count()
 
     def move_to_next(self):
+        if self.playlist_count() == 0: return
         self.play_idx = (self.play_idx + 1) % self.playlist_count()
 
     def time_ms_to_str(self, time_ms):

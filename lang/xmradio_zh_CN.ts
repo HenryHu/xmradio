@@ -72,6 +72,11 @@
         <translation>正在听电台%s (%s)</translation>
     </message>
     <message>
+        <location filename="../gui.py" line="232"/>
+        <source>Playlist empty</source>
+        <translation>播放列表为空</translation>
+    </message>
+    <message>
         <location filename="../gui.py" line="227"/>
         <source>No song to play, can&apos;t find song %d</source>
         <translation>无法播放，找不到歌曲%d</translation>
