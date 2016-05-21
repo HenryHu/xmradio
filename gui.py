@@ -105,6 +105,11 @@ class ThingsModel(QtCore.QAbstractListModel):
         self._things.append(data)
         self.endInsertRows()
 
+    def delete(self, idx):
+        self.beginRemoveRows(QtCore.QModelIndex(), idx, idx)
+        self._things = self._things[:idx] + self._things[(idx + 1):]
+        self.endRemoveRows()
+
     def get(self, index):
         return self._things[index]
 
@@ -231,9 +236,23 @@ class MainWin(QtCore.QObject):
             self.add_track(track)
 
     # playlist
-    def song_clicked(self, song, idx):
+    def song_dblclicked(self, song, idx):
         self.move_to(idx, True)
         self.start_player()
+
+    def song_clicked(self, buttons, song, idx):
+        if buttons & QtCore.Qt.RightButton:
+            self.playlist_model.delete(idx)
+        if self.play_idx == idx:
+            if idx == self.playlist_count():
+                # deleted last song
+                self.move_to(0, False)
+            else:
+                self.move_to(idx, False)
+            self.start_player()
+        elif self.play_idx > idx:
+            self.play_idx -= 1
+        self.del_history(idx)
 
     def add_track(self, track):
         self.playlist_model.append(SongWrapper(track))
@@ -399,6 +418,16 @@ class MainWin(QtCore.QObject):
         else:
             return None
 
+    def del_history(self, idx):
+        # handle deletion
+        new_history = []
+        for entry in self.history:
+            if entry < idx:
+                new_history.append(entry)
+            elif entry > idx:
+                new_history.append(entry - 1)
+        self.history = new_history
+
     # tray functions
     def tray_exit_clicked(self):
         sys.exit(0)
@@ -438,6 +467,7 @@ class MainWin(QtCore.QObject):
         self.root_obj.playerPosition.connect(self.player_position)
         self.root_obj.playerStatus.connect(self.player_status)
         self.root_obj.progressSeek.connect(self.progress_seek)
+        self.root_obj.songDblClicked.connect(self.song_dblclicked)
         self.root_obj.songClicked.connect(self.song_clicked)
         self.root_obj.stationClicked.connect(self.station_clicked)
         self.root_obj.playerError.connect(self.player_error)

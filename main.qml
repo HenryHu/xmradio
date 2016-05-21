@@ -21,7 +21,8 @@ Rectangle {
     signal playerDuration(int duration)
     signal playerStatus(int status)
     signal progressSeek(real x, real width)
-    signal songClicked(var item, int index)
+    signal songDblClicked(var item, int index)
+    signal songClicked(var buttons, var item, int index)
     signal stationClicked(var item, int index)
     signal exitClicked()
 
@@ -164,10 +165,12 @@ Rectangle {
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
                 onDoubleClicked: {
                     playlist.currentIndex = model.index
-                    songClicked(model.display, model.index)
+                    songDblClicked(model.display, model.index)
                 }
+                onClicked: songClicked(mouse.button, model.display, model.index)
                 onEntered: songCell.color = "lightgreen"
                 onExited: songCell.color = decideColor()
             }
