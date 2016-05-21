@@ -336,6 +336,11 @@ class MainWin(QtCore.QObject):
 
         app = QGuiApplication(sys.argv)
 
+        qt_translator = QtCore.QTranslator()
+        qt_translator.load("xmradio_%s" % QtCore.QLocale().name(), "lang")
+        app.installTranslator(qt_translator)
+        qt_translator
+
         # Create the QML user interface.
         self.main_win = QQuickView()
         self.main_win.setTitle(self.tr("Xiami Player"))
