@@ -283,13 +283,11 @@ class MainWin(QtCore.QObject):
         if self.mode == "station":
             self.fetch_from_station(self.current_station)
             self.move_to_next()
-            self.start_player()
         else:
             if self.mode == "random_guess":
                 self.move_to_random()
             else:
                 self.play_idx = 0
-            self.start_player()
 
     def proper_next(self):
         if self.play_idx == self.playlist_count() - 1:
@@ -299,7 +297,7 @@ class MainWin(QtCore.QObject):
                 self.move_to_random()
             else:
                 self.move_to_next()
-            self.start_player()
+        self.start_player()
 
     def player_stopped(self):
         pass
