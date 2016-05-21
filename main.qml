@@ -366,7 +366,7 @@ Rectangle {
             id: progressText
             x: 167
             y: 9
-            text: qsTr("")
+            text: ""
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             font.pixelSize: 12
