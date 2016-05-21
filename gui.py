@@ -420,7 +420,6 @@ class LoginWin(QtCore.QObject):
             try:
                 ret = login.login(self.state, username, password)
             except Exception as e:
-                print(e.message)
                 self.set_state(e.message)
                 return
             if not ret[0]:
