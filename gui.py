@@ -22,6 +22,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 logger = logging.getLogger("gui")
 
 ERROR_WAIT = 5
+MAX_HISTORY_LEN = 1000 # seriously?
 
 class XMTrayIcon(QtWidgets.QSystemTrayIcon):
     def event(self, evt):
@@ -156,8 +157,7 @@ class MainWin(QtCore.QObject):
         self.proper_next()
 
     def prev_clicked(self):
-        self.move_to_prev()
-        self.start_player()
+        self.proper_prev()
 
     def pause_clicked(self):
         self.root_obj.pause()
@@ -194,7 +194,7 @@ class MainWin(QtCore.QObject):
 
     def clear_playlist(self):
         self.playlist_model.clear()
-        self.play_idx = 0
+        self.move_to(0, False)
 
     # stations
     def load_fav_clicked(self):
@@ -232,7 +232,7 @@ class MainWin(QtCore.QObject):
 
     # playlist
     def song_clicked(self, song, idx):
-        self.play_idx = idx
+        self.move_to(idx, True)
         self.start_player()
 
     def add_track(self, track):
@@ -277,16 +277,22 @@ class MainWin(QtCore.QObject):
     def playlist_count(self):
         return self.playlist_model.rowCount()
 
-    def move_to_prev(self):
-        if self.playlist_count() == 0: return
-        self.play_idx = (self.play_idx - 1 + self.playlist_count()) % self.playlist_count()
+    def move_to(self, idx, add_to_history):
+        if add_to_history:
+            self.push_history(self.play_idx)
+        logger.debug("moving to %d history %r" % (idx, self.history))
+        self.play_idx = idx
 
-    def move_to_next(self):
+    def move_to_prev(self, add_to_history=True):
         if self.playlist_count() == 0: return
-        self.play_idx = (self.play_idx + 1) % self.playlist_count()
+        self.move_to((self.play_idx - 1 + self.playlist_count()) % self.playlist_count(), add_to_history)
 
-    def move_to_random(self):
-        self.play_idx = random.randint(0, self.playlist_count() - 1)
+    def move_to_next(self, add_to_history=True):
+        if self.playlist_count() == 0: return
+        self.move_to((self.play_idx + 1) % self.playlist_count(), add_to_history)
+
+    def move_to_random(self, add_to_history=True):
+        self.move_to(random.randint(0, self.playlist_count() - 1), add_to_history)
 
     def next_of_tail(self):
         # fetch more or jump back
@@ -297,7 +303,7 @@ class MainWin(QtCore.QObject):
             if self.mode == "random_guess":
                 self.move_to_random()
             else:
-                self.play_idx = 0
+                self.move_to(0, True)
 
     def proper_next(self):
         if self.play_idx == self.playlist_count() - 1:
@@ -307,6 +313,17 @@ class MainWin(QtCore.QObject):
                 self.move_to_random()
             else:
                 self.move_to_next()
+        self.start_player()
+
+    def proper_prev(self):
+        idx = self.pop_history()
+        if idx is not None:
+            self.move_to(idx, False)
+            self.start_player()
+        elif self.mode == "random_guess":
+            self.move_to_random(False)
+        else:
+            self.move_to_prev(False)
         self.start_player()
 
     # player event handling
@@ -335,8 +352,7 @@ class MainWin(QtCore.QObject):
         self.update_position()
 
     def player_error(self, error, error_str):
-        print(error)
-        print(error_str)
+        logger.error("Player error %r %s" % (error, error_str))
 
     def record_play(self, track, playtype="10"):
         # type 10 -> play from radio
@@ -368,6 +384,20 @@ class MainWin(QtCore.QObject):
 
     def exit_clicked(self):
         sys.exit(0)
+
+    # history
+    def push_history(self, item):
+        self.history.append(item)
+        if len(self.history) > MAX_HISTORY_LEN:
+            self.history = self.history[1:]
+
+    def pop_history(self):
+        if len(self.history) > 0:
+            ret = self.history[-1]
+            self.history = self.history[:-1]
+            return ret
+        else:
+            return None
 
     # tray functions
     def tray_exit_clicked(self):
@@ -440,6 +470,7 @@ class MainWin(QtCore.QObject):
         self.position = 0
         self.current_station = None
         self.mode = 'stopped'
+        self.history = []
 
 class LoginWin(QtCore.QObject):
     def __init__(self, state, app):
