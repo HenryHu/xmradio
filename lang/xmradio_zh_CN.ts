@@ -153,14 +153,19 @@
         <translation> [高品质]</translation>
     </message>
     <message>
-        <location filename="../gui.py" line="346"/>
-        <source>Xiami Player</source>
-        <translation>虾米播放器</translation>
-    </message>
-    <message>
         <location filename="../gui.py" line="375"/>
         <source>Ready</source>
         <translation>Ready</translation>
+    </message>
+    <message>
+        <location filename="../gui.py" line="395"/>
+        <source>Exit</source>
+        <translation>退出</translation>
+    </message>
+    <message>
+        <location filename="../gui.py" line="346"/>
+        <source>Xiami Player</source>
+        <translation>虾米播放器</translation>
     </message>
 </context>
 <context>

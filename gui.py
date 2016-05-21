@@ -23,6 +23,20 @@ logger = logging.getLogger("gui")
 
 ERROR_WAIT = 5
 
+class XMTrayIcon(QtWidgets.QSystemTrayIcon):
+    def event(self, evt):
+        if isinstance(evt, QtGui.QWheelEvent):
+            delta = evt.angleDelta()
+            if delta.y() < 0:
+                self.back.emit()
+            elif delta.y() > 0:
+                self.forward.emit()
+            return True
+        return QtWidgets.QSystemTrayIcon.event(self, evt)
+
+    back = QtCore.pyqtSignal()
+    forward = QtCore.pyqtSignal()
+
 class StationWrapper(QtCore.QObject):
     def __init__(self, station):
         QtCore.QObject.__init__(self)
@@ -350,6 +364,12 @@ class MainWin(QtCore.QObject):
         elif reason == 4:
             self.root_obj.pause()
 
+    def tray_forward(self):
+        self.prev_clicked()
+
+    def tray_back(self):
+        self.next_clicked()
+
     def create(self):
         # Create the QML user interface.
         self.main_win = QQuickView()
@@ -388,13 +408,15 @@ class MainWin(QtCore.QObject):
 #        rc.setContextProperty("controller", self)
 
         self.tray_menu = QtWidgets.QMenu()
-        exit_action = self.tray_menu.addAction("Exit")
-        self.tray_icon = QtWidgets.QSystemTrayIcon(QtGui.QIcon("icon.png"))
+        exit_action = self.tray_menu.addAction(self.tr("Exit"))
+        self.tray_icon = XMTrayIcon(QtGui.QIcon("icon.png"))
         self.tray_icon.setToolTip(self.tr("Xiami Player"))
         self.tray_icon.setContextMenu(self.tray_menu)
         self.tray_icon.show()
         exit_action.triggered.connect(self.tray_exit_clicked)
         self.tray_icon.activated.connect(self.tray_activated)
+        self.tray_icon.forward.connect(self.tray_forward)
+        self.tray_icon.back.connect(self.tray_back)
 
         self.play_idx = 0
         self.duration = 0
