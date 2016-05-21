@@ -68,7 +68,7 @@ class SongWrapper(QtCore.QObject):
 
     def _title(self):
         unescaper = HTMLParser.HTMLParser()
-        return unescaper.unescape(self.tr("%s by %s") % (self._track.title, self._track.artist))
+        return unescaper.unescape(self.tr("%s by %s") % (self._track.get_title(), self._track.artist))
 
     def _desc(self):
         unescaper = HTMLParser.HTMLParser()
@@ -264,7 +264,7 @@ class MainWin(QtCore.QObject):
 
         self.set_status(
                 self.tr("Listening to: %s by %s from album %s%s #%s") %
-                (track.title, track.artist, track.album_name,
+                (track.get_title(), track.artist, track.album_name,
                     self.tr(" [HQ]") if is_hq else "", track.song_id))
         if track.length:
             # missing? whatever...

@@ -91,6 +91,12 @@ class Song(object):
     def dump_info(self):
         print self.title, self.location
 
+    def get_title(self):
+        if hasattr(self, 'songName'):
+            return self.songName
+        else:
+            return self.title
+
     def get_lyric(self):
         if not hasattr(self, 'song_id'):
             raise Exception("missing song id")
@@ -172,9 +178,6 @@ class Song(object):
 
         my_info = song_info['data']['trackList'][0]
         self.__init__(my_info)
-        if hasattr(self, 'songName'):
-            # for some reason, title = album_name
-            self.title = self.songName
 
     def load_info_from_page(self):
         ''' Load info of this song, index by song_id (deprecated)'''
