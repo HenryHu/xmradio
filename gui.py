@@ -114,9 +114,10 @@ class ThingsModel(QtCore.QAbstractListModel):
         self.last_highlight = idx
 
 class MainWin(QtCore.QObject):
-    def __init__(self, state):
+    def __init__(self, state, app):
         QtCore.QObject.__init__(self)
         self.state = state
+        self.app = app
 
     def guess_clicked(self):
         self.mode = "guess"
@@ -340,10 +341,20 @@ class MainWin(QtCore.QObject):
     def set_status(self, status):
         self.main_win.rootObject().setStatus(status)
 
+    def tray_exit_clicked(self):
+        sys.exit(0)
+
+    def tray_activated(self, reason):
+        if reason == 3:
+            self.main_win.show()
+        elif reason == 4:
+            self.root_obj.pause()
+
     def create(self):
         # Create the QML user interface.
         self.main_win = QQuickView()
         self.main_win.setTitle(self.tr("Xiami Player"))
+        self.main_win.setIcon(QtGui.QIcon("icon.png"))
         self.main_win.setSource(QUrl('main.qml'))
         self.main_win.setResizeMode(QQuickView.SizeRootObjectToView)
         self.main_win.show()
@@ -375,6 +386,15 @@ class MainWin(QtCore.QObject):
         self.set_status(self.tr("Ready"))
 #        rc = self.main_win.rootContext()
 #        rc.setContextProperty("controller", self)
+
+        self.tray_menu = QtWidgets.QMenu()
+        exit_action = self.tray_menu.addAction("Exit")
+        self.tray_icon = QtWidgets.QSystemTrayIcon(QtGui.QIcon("icon.png"))
+        self.tray_icon.setToolTip(self.tr("Xiami Player"))
+        self.tray_icon.setContextMenu(self.tray_menu)
+        self.tray_icon.show()
+        exit_action.triggered.connect(self.tray_exit_clicked)
+        self.tray_icon.activated.connect(self.tray_activated)
 
         self.play_idx = 0
         self.duration = 0
@@ -440,7 +460,7 @@ class XiamiPlayer(QtCore.QObject):
         self.running = False
         self.state = init.init()
 
-        self.app = QGuiApplication(sys.argv)
+        self.app = QtWidgets.QApplication(sys.argv)
 
         qt_translator = QtCore.QTranslator()
         qt_translator.load("xmradio_%s" % QtCore.QLocale().name(), "lang")
@@ -449,7 +469,7 @@ class XiamiPlayer(QtCore.QObject):
         self.authenticate()
 
     def auth_ok(self):
-        self.main_win = MainWin(self.state)
+        self.main_win = MainWin(self.state, self)
         self.main_win.create()
         self.run()
 
