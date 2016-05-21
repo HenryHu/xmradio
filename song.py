@@ -88,6 +88,11 @@ class Song(object):
         else:
             self.info_loaded = False
 
+    @staticmethod
+    def from_id(song_id):
+        song_info = {'song_id': str(song_id)}
+        return Song(song_info)
+
     def dump_info(self):
         print self.title, self.location
 

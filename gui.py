@@ -5,12 +5,14 @@ import init
 import info
 import sys
 import time
+import re
 import os
 import logging
 import playlist
 import localplaylist
 import HTMLParser
 import random
+import song
 from functools import partial
 
 from PyQt5.QtCore import QObject, QUrl
@@ -246,13 +248,44 @@ class MainWin(QtCore.QObject):
         if self.play_idx == idx:
             if idx == self.playlist_count():
                 # deleted last song
-                self.move_to(0, False)
+                if self.playlist_count() == 0:
+                    self.root_obj.stop()
+                    self.root_obj.setProgress(0, 0, "")
+                else:
+                    self.move_to(0, False)
             else:
                 self.move_to(idx, False)
             self.start_player()
         elif self.play_idx > idx:
             self.play_idx -= 1
         self.del_history(idx)
+
+    song_id_re = re.compile("/song/([0-9]+)")
+    album_id_re = re.compile("/album/([0-9]+)")
+    def extract_song_id_from_text(self, text):
+        if text.isdigit():
+            return [text]
+        found_ids = self.song_id_re.findall(text)
+        if len(found_ids) > 0:
+            return found_ids
+        # TODO: handle albums
+        return []
+
+    def playlist_paste(self):
+        content = self.app.app.clipboard().text()
+        song_ids = self.extract_song_id_from_text(content)
+        was_empty = self.playlist_count() == 0
+        if len(song_ids) > 0:
+            for song_id in song_ids:
+                track = song.Song.from_id(song_id)
+                track.load_info()
+                self.playlist_model.append(SongWrapper(track))
+        else:
+            self.set_status(self.tr("No song found from clipboard"))
+        if self.mode == 'stopped' or was_empty:
+            self.mode = 'local_playlist'
+            self.state['player_path'] = playlist.player_path
+            self.start_player()
 
     def add_track(self, track):
         self.playlist_model.append(SongWrapper(track))
@@ -381,6 +414,10 @@ class MainWin(QtCore.QObject):
             logger.exception("fail to record")
 
     # misc
+    def key_pressed(self, key, modifiers):
+        if key == ord('V') and modifiers == QtCore.Qt.ControlModifier:
+            self.playlist_paste()
+
     def time_ms_to_str(self, time_ms):
         time_s = int(time_ms / 1000)
         time_h = time_s / 3600
@@ -472,6 +509,7 @@ class MainWin(QtCore.QObject):
         self.root_obj.stationClicked.connect(self.station_clicked)
         self.root_obj.playerError.connect(self.player_error)
         self.root_obj.exitClicked.connect(self.exit_clicked)
+        self.root_obj.keyPressed.connect(self.key_pressed)
 
         self.fav_model = ThingsModel([])
         self.playlist_model = ThingsModel([])

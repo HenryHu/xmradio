@@ -6,6 +6,8 @@ Rectangle {
     id: page
     color: "lightgrey"
     width: 800; height: 600
+    focus: true
+    Keys.onPressed: keyPressed(event.key, event.modifiers)
 
     signal guessClicked()
     signal randomGuessClicked()
@@ -23,6 +25,7 @@ Rectangle {
     signal progressSeek(real x, real width)
     signal songDblClicked(var item, int index)
     signal songClicked(var buttons, var item, int index)
+    signal keyPressed(int key, int modifiers)
     signal stationClicked(var item, int index)
     signal exitClicked()
 

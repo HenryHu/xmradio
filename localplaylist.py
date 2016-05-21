@@ -17,8 +17,7 @@ class LocalPlaylist(object):
                 line = line.strip()
                 try:
                     song_id = int(line)
-                    song_info = {'song_id': str(song_id)}
-                    track = song.Song(song_info)
+                    track = song.Song.from_id(song_info)
                     self.items += [track]
                 except:
                     pass
