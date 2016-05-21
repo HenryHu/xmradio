@@ -25,6 +25,7 @@ logger = logging.getLogger("gui")
 
 ERROR_WAIT = 5
 MAX_HISTORY_LEN = 1000 # seriously?
+SONG_URL_TEMPLATE = "http://www.xiami.com/song/%s"
 
 class XMTrayIcon(QtWidgets.QSystemTrayIcon):
     def event(self, evt):
@@ -287,6 +288,10 @@ class MainWin(QtCore.QObject):
             self.state['player_path'] = playlist.player_path
             self.start_player()
 
+    def playlist_copy(self):
+        song_id = self.playlist_model.get(self.play_idx)._track.song_id
+        self.app.app.clipboard().setText(SONG_URL_TEMPLATE % song_id)
+
     def add_track(self, track):
         self.playlist_model.append(SongWrapper(track))
 
@@ -417,6 +422,8 @@ class MainWin(QtCore.QObject):
     def key_pressed(self, key, modifiers):
         if key == ord('V') and modifiers == QtCore.Qt.ControlModifier:
             self.playlist_paste()
+        elif key == ord('C') and modifiers == QtCore.Qt.ControlModifier:
+            self.playlist_copy()
 
     def time_ms_to_str(self, time_ms):
         time_s = int(time_ms / 1000)
