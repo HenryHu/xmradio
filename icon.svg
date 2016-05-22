@@ -28,9 +28,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="-136.45037"
-     inkscape:cy="148.72671"
+     inkscape:zoom="0.175"
+     inkscape:cx="-1796.0302"
+     inkscape:cy="246.0042"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -95,15 +95,17 @@
          id="flowPara3377" /></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3379"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:160px;line-height:125%;font-family:'Simsun Nina Z';-inkscape-font-specification:'Simsun Nina Z';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       transform="translate(27.428572,809.2193)"><flowRegion
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:130px;line-height:125%;font-family:'Helvetica Rounded LT Std';-inkscape-font-specification:'Helvetica Rounded LT Std Bold';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
+       transform="translate(34.035174,857.70662)"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><flowRegion
          id="flowRegion3381"><rect
            id="rect3383"
            width="257.14285"
            height="230"
            x="0"
            y="18.857143"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:160px;font-family:'Simsun Nina Z';-inkscape-font-specification:'Simsun Nina Z'" /></flowRegion><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:130px;font-family:'Helvetica Rounded LT Std';-inkscape-font-specification:'Helvetica Rounded LT Std Bold';fill:#ffffff;" /></flowRegion><flowPara
          id="flowPara3385"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:160px;font-family:'Simsun Nina Z';-inkscape-font-specification:'Simsun Nina Z'">XM</flowPara></flowRoot>  </g>
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:130px;font-family:'Helvetica Rounded LT Std';-inkscape-font-specification:'Helvetica Rounded LT Std Bold';fill:#ffffff;">XM</flowPara></flowRoot>  </g>
 </svg>
