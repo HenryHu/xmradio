@@ -138,6 +138,11 @@
         <translation>正在听电台%s (%s)</translation>
     </message>
     <message>
+        <location filename="../gui.py" line="285"/>
+        <source>No song found from clipboard</source>
+        <translation>剪贴板中没有歌曲</translation>
+    </message>
+    <message>
         <location filename="../gui.py" line="232"/>
         <source>Playlist empty</source>
         <translation>播放列表为空</translation>
@@ -156,6 +161,11 @@
         <location filename="../gui.py" line="243"/>
         <source> [HQ]</source>
         <translation> [高品质]</translation>
+    </message>
+    <message>
+        <location filename="../gui.py" line="326"/>
+        <source>Xiami Player - %s by %s from %s</source>
+        <translation>虾米播放器 - %s - %s [%s]</translation>
     </message>
     <message>
         <location filename="../gui.py" line="375"/>

@@ -323,6 +323,8 @@ class MainWin(QtCore.QObject):
                 self.tr("Listening to: %s by %s from album %s%s #%s") %
                 (track.get_title(), track.artist, track.album_name,
                     self.tr(" [HQ]") if is_hq else "", track.song_id))
+        self.set_tray_tooltip(self.tr("Xiami Player - %s by %s from %s") %
+                (track.get_title(), track.artist, track.album_name))
         if track.length:
             # missing? whatever...
             self.duration = int(track.length) * 1000
@@ -489,6 +491,9 @@ class MainWin(QtCore.QObject):
 
     def tray_back(self):
         self.next_clicked()
+
+    def set_tray_tooltip(self, tooltip):
+        self.tray_icon.setToolTip(tooltip)
 
     def create(self):
         # Create the QML user interface.
