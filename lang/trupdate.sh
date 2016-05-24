@@ -6,8 +6,8 @@ PYS=../gui.py
 echo "Updating qml"
 lupdate -verbose $QMLS -ts qml.ts
 echo "Updating py"
-pylupdate5 -verbose $PYS -ts py.ts
-sed -I .orig -e 's/filename="/filename="..\//' py.ts
+pylupdate5 -verbose $PYS -ts py.orig.ts
+sed -e 's/filename="/filename="..\//' py.orig.ts > py.ts
 
 for lang in "zh_CN"; do
     echo "Updating $lang"
@@ -25,4 +25,4 @@ for lang in "zh_CN"; do
     lrelease -verbose $path -qm $compiled
 done
 
-rm qml.ts py.ts py.ts.orig
+rm qml.ts py.ts py.orig.ts
