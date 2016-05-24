@@ -101,8 +101,7 @@ Rectangle {
         text: qsTr("Playlist")
         anchors.left: parent.left
         anchors.leftMargin: 8
-        anchors.top: parent.top
-        anchors.topMargin: 8
+        anchors.verticalCenter: btnGuess.verticalCenter
     }
 
     Text {
@@ -206,10 +205,11 @@ Rectangle {
 
     Button {
         id: btnGuess
+        anchors.top: parent.top
+        anchors.topMargin: 8
         anchors.left: lblPlaylist.right
         anchors.leftMargin: 8
         text: qsTr("Guess")
-        anchors.verticalCenter: lblPlaylist.verticalCenter
         onClicked: guessClicked()
     }
 
