@@ -1,4 +1,5 @@
-import cookielib, urllib2, urllib
+import urllib2
+import urllib
 from HTMLParser import HTMLParser
 import logging
 import json
@@ -10,6 +11,7 @@ logger = logging.getLogger('login')
 login_url = "https://login.xiami.com/member/login"
 login_post_url = "https://login.xiami.com/member/login"
 img_path = "/tmp/validate.png"
+
 
 class LoginPageParser(HTMLParser):
     def __init__(self):
@@ -45,6 +47,7 @@ class LoginPageParser(HTMLParser):
     def handle_data(self, data):
         pass
 
+
 def login(state, username, password):
     login_page = urllib2.urlopen(login_url).read()
 
@@ -65,6 +68,7 @@ def login(state, username, password):
 
     login_with_code(state, post_args, None)
     return (True,)
+
 
 def login_with_code(state, post_args, code):
     if code is not None:
@@ -90,8 +94,11 @@ def login_with_code(state, post_args, code):
     if 'jumpurl' in login_ret_parsed and login_ret_parsed['jumpurl']:
         jumpurl = login_ret_parsed['jumpurl']
         jump_page = urllib2.urlopen(jumpurl).read()
+        logger.debug("jump to: %s" % jumpurl)
+        logger.debug("jump page: %s" % jump_page)
 
     logger.info('login ok')
+
 
 def login_console(state, username, password):
     ret = login(state, username, password)

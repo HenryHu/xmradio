@@ -5,6 +5,7 @@ import codecs
 
 logger = logging.getLogger("localplaylist")
 
+
 class LocalPlaylist(object):
     def __init__(self):
         self.items = []
@@ -37,7 +38,9 @@ class LocalPlaylist(object):
             os.rename(filename, filename + os.extsep + "old")
         with codecs.open(filename, 'w', 'utf-8') as outf:
             for track in self.items:
-                outf.write(u"{id} # {title} by {artist} {info}\n".format(id=track.song_id, title=track.title, artist=track.artist, info=track.encode()))
+                outf.write(u"{id} # {title} by {artist} {info}\n"
+                           .format(id=track.song_id, title=track.title,
+                                   artist=track.artist, info=track.encode()))
 
     def count(self):
         return len(self.items)
@@ -50,7 +53,7 @@ class LocalPlaylist(object):
             logger.exception("error loading info")
         return track
 
-    def insert(self, track, idx = 0):
+    def insert(self, track, idx=0):
         self.items.insert(idx, track)
 
     def append(self, track):

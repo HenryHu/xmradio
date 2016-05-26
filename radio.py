@@ -16,6 +16,7 @@ radio_data_rex = re.compile("/radio/xml/type/([0-9]+)/id/([0-9]+)")
 
 logger = logging.getLogger('radio')
 
+
 class RadioPageParser(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
@@ -48,6 +49,7 @@ class RadioPageParser(HTMLParser):
         if tag == 'object' and self.in_player:
             self.in_player = False
 
+
 def visit_radio(state, radio_pid):
     radio_url = radio_url_temp % radio_pid
     logger.debug("radio page: %s" % radio_url)
@@ -66,9 +68,10 @@ def visit_radio(state, radio_pid):
     state['radio_type'] = result.group(1)
     state['radio_id'] = result.group(2)
 
+
 def get_radio_list(state, radio_type, radio_id):
     # visit the radio page to get v value
-    if not 'v_val' in state:
+    if 'v_val' not in state:
         raise Exception("visit radio page first")
 
     # get list of songs
@@ -101,6 +104,7 @@ def get_radio_list(state, radio_type, radio_id):
 
     return tracks
 
+
 def get_fav_radio(state, page):
     assert(page >= 1)
     fav_radio_url = fav_radio_url_temp % page
@@ -113,6 +117,7 @@ def get_fav_radio(state, page):
     # unknown
     prev_fav = fav_radios['prev']
     next_fav = fav_radios['next']
+    logger.debug("prev, next: %s %s" % (prev_fav, next_fav))
 
     fav_radios = fav_radios['data']
     return fav_radios

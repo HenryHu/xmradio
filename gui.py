@@ -3,20 +3,15 @@ import login
 import radio
 import init
 import info
-import sys
-import time
 import re
-import os
 import logging
 import playlist
 import localplaylist
 import HTMLParser
 import random
 import song
-from functools import partial
 
 from PyQt5.QtCore import QObject, QUrl
-from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtQuick import QQuickView
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -24,8 +19,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 logger = logging.getLogger("gui")
 
 ERROR_WAIT = 5
-MAX_HISTORY_LEN = 1000 # seriously?
+MAX_HISTORY_LEN = 1000  # seriously?
 SONG_URL_TEMPLATE = "http://www.xiami.com/song/%s"
+
 
 class XMTrayIcon(QtWidgets.QSystemTrayIcon):
     def event(self, evt):
@@ -41,6 +37,7 @@ class XMTrayIcon(QtWidgets.QSystemTrayIcon):
     back = QtCore.pyqtSignal()
     forward = QtCore.pyqtSignal()
 
+
 class StationWrapper(QtCore.QObject):
     def __init__(self, station):
         QtCore.QObject.__init__(self)
@@ -49,7 +46,9 @@ class StationWrapper(QtCore.QObject):
 
     def _title(self):
         unescaper = HTMLParser.HTMLParser()
-        return self.tr("%s fav by %s") % (unescaper.unescape(self._station['radio_name']), self._station['fav_count'])
+        return self.tr("%s fav by %s") % (
+            unescaper.unescape(self._station['radio_name']),
+            self._station['fav_count'])
 
     def _desc(self):
         unescaper = HTMLParser.HTMLParser()
@@ -63,6 +62,7 @@ class StationWrapper(QtCore.QObject):
     desc = QtCore.pyqtProperty(unicode, _desc, notify=changed)
     highlight = QtCore.pyqtProperty(bool, _highlight, notify=changed)
 
+
 class SongWrapper(QtCore.QObject):
     def __init__(self, track):
         QtCore.QObject.__init__(self)
@@ -71,11 +71,15 @@ class SongWrapper(QtCore.QObject):
 
     def _title(self):
         unescaper = HTMLParser.HTMLParser()
-        return unescaper.unescape(self.tr("%s by %s") % (self._track.get_title(), self._track.artist))
+        return unescaper.unescape(
+            self.tr("%s by %s") % (self._track.get_title(),
+                                   self._track.artist))
 
     def _desc(self):
         unescaper = HTMLParser.HTMLParser()
-        return unescaper.unescape(self.tr("from %s #%s") % (self._track.album_name, self._track.song_id))
+        return unescaper.unescape(
+            self.tr("from %s #%s") % (self._track.album_name,
+                                      self._track.song_id))
 
     def _image_url(self):
         return self._track.pic
@@ -89,6 +93,7 @@ class SongWrapper(QtCore.QObject):
     image_url = QtCore.pyqtProperty(unicode, _image_url, notify=changed)
     highlight = QtCore.pyqtProperty(bool, _highlight, notify=changed)
 
+
 class ThingsModel(QtCore.QAbstractListModel):
     def __init__(self, things):
         QtCore.QAbstractListModel.__init__(self)
@@ -99,12 +104,13 @@ class ThingsModel(QtCore.QAbstractListModel):
         return len(self._things)
 
     def data(self, index, role):
-        if index.isValid(): # and role == ThingListModel.COLUMNS.index('thing'):
+        if index.isValid():  # and role == .index('thing'):
             return self._things[index.row()]
         return None
 
     def append(self, data):
-        self.beginInsertRows(QtCore.QModelIndex(), self.rowCount(), self.rowCount())
+        self.beginInsertRows(QtCore.QModelIndex(),
+                             self.rowCount(), self.rowCount())
         self._things.append(data)
         self.endInsertRows()
 
@@ -126,8 +132,8 @@ class ThingsModel(QtCore.QAbstractListModel):
             self._things[self.last_highlight].is_highlight = False
             self._things[self.last_highlight].changed.emit()
             # does not work
-            self.dataChanged.emit(
-                    self.index(self.last_highlight), self.index(self.last_highlight))
+            self.dataChanged.emit(self.index(self.last_highlight),
+                                  self.index(self.last_highlight))
         if idx != -1 and idx < len(self._things):
             self._things[idx].is_highlight = True
             # does not work
@@ -135,6 +141,7 @@ class ThingsModel(QtCore.QAbstractListModel):
         # should not need this, but dataChanged has no effect
         self.modelReset.emit()
         self.last_highlight = idx
+
 
 class MainWin(QtCore.QObject):
     def __init__(self, state, app):
@@ -229,8 +236,8 @@ class MainWin(QtCore.QObject):
 
     def fetch_from_station(self, station):
         try:
-            tracks = radio.get_radio_list(self.state,
-                    self.state['radio_type'], self.state['radio_id'])
+            tracks = radio.get_radio_list(self.state, self.state['radio_type'],
+                                          self.state['radio_id'])
         except:
             logger.exception("fail to get list of songs")
             return
@@ -263,6 +270,7 @@ class MainWin(QtCore.QObject):
 
     song_id_re = re.compile("/song/([0-9]+)")
     album_id_re = re.compile("/album/([0-9]+)")
+
     def extract_song_id_from_text(self, text):
         if text.isdigit():
             return [text]
@@ -312,8 +320,7 @@ class MainWin(QtCore.QObject):
                 url = track.get_hq_location(self.state)
             except Exception as e:
                 logger.warning(
-                        "WARNING: error occoured when fetching high quality source: %r"
-                        % e)
+                    "WARNING: error occoured when fetching high quality source: %r" % e)
                 url = track.location
                 is_hq = False
         else:
@@ -324,7 +331,8 @@ class MainWin(QtCore.QObject):
                 (track.get_title(), track.artist, track.album_name,
                     self.tr(" [HQ]") if is_hq else "", track.song_id))
         self.set_tray_tooltip(self.tr("Xiami Player - %s by %s from %s") %
-                (track.get_title(), track.artist, track.album_name))
+                              (track.get_title(), track.artist,
+                               track.album_name))
         if track.length:
             # missing? whatever...
             self.duration = int(track.length) * 1000
@@ -343,15 +351,20 @@ class MainWin(QtCore.QObject):
         self.play_idx = idx
 
     def move_to_prev(self, add_to_history=True):
-        if self.playlist_count() == 0: return
-        self.move_to((self.play_idx - 1 + self.playlist_count()) % self.playlist_count(), add_to_history)
+        if self.playlist_count() == 0:
+            return
+        self.move_to((self.play_idx - 1 + self.playlist_count()) %
+                     self.playlist_count(), add_to_history)
 
     def move_to_next(self, add_to_history=True):
-        if self.playlist_count() == 0: return
-        self.move_to((self.play_idx + 1) % self.playlist_count(), add_to_history)
+        if self.playlist_count() == 0:
+            return
+        self.move_to((self.play_idx + 1) %
+                     self.playlist_count(), add_to_history)
 
     def move_to_random(self, add_to_history=True):
-        self.move_to(random.randint(0, self.playlist_count() - 1), add_to_history)
+        self.move_to(random.randint(0, self.playlist_count() - 1),
+                     add_to_history)
 
     def next_of_tail(self):
         # fetch more or jump back
@@ -394,11 +407,12 @@ class MainWin(QtCore.QObject):
     def player_stopped(self):
         pass
 #        if self.player_ended():
-            # stopped because end
+#           # stopped because end
 #            self.proper_next()
 
     def player_status(self, status):
-        logger.debug("status: %d" % self.main_win.rootObject().getPlayerStatus())
+        logger.debug("status: %d" %
+                     self.main_win.rootObject().getPlayerStatus())
         if self.player_ended():
             self.proper_next()
 
@@ -416,7 +430,8 @@ class MainWin(QtCore.QObject):
     def record_play(self, track, playtype="10"):
         # type 10 -> play from radio
         try:
-            info.record_play(self.state, track.song_id, None, info.is_vip(self.state), playtype)
+            info.record_play(self.state, track.song_id, None,
+                             info.is_vip(self.state), playtype)
         except:
             logger.exception("fail to record")
 
@@ -444,7 +459,8 @@ class MainWin(QtCore.QObject):
         cur_pos = self.time_ms_to_str(self.position)
         max_pos = self.time_ms_to_str(self.duration)
         msg = "%s (%s)" % (cur_pos, max_pos)
-        self.main_win.rootObject().setProgress(self.duration, self.position, msg)
+        self.main_win.rootObject().setProgress(self.duration, self.position,
+                                               msg)
 
     def set_status(self, status):
         self.main_win.rootObject().setStatus(status)
@@ -554,6 +570,7 @@ class MainWin(QtCore.QObject):
         self.mode = 'stopped'
         self.history = []
 
+
 class LoginWin(QtCore.QObject):
     def __init__(self, state, app):
         QtCore.QObject.__init__(self)
@@ -598,7 +615,8 @@ class LoginWin(QtCore.QObject):
                 with open(login.img_path, 'wb') as imgf:
                     imgf.write(ret[2])
                 self.set_state(self.tr("Please enter verification code"))
-                self.root_obj.setVerificationImage("file://%s" % login.img_path)
+                self.root_obj.setVerificationImage("file://%s"
+                                                   % login.img_path)
                 self.key = ret[1]
             else:
                 self.ok()
@@ -606,6 +624,7 @@ class LoginWin(QtCore.QObject):
     def ok(self):
         self.login_win.close()
         self.app.auth_ok()
+
 
 class XiamiPlayer(QtCore.QObject):
     def main(self):

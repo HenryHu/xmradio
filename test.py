@@ -9,6 +9,7 @@ import urllib2
 test_pass = 0
 test_total = 0
 
+
 def test_func(func):
     def test_wrapper(*args, **kwargs):
         print "running test %s" % func.__name__
@@ -27,12 +28,14 @@ def test_func(func):
 
     return test_wrapper
 
+
 @test_func
 def test_song_lyric():
     import song
     track = song.Song()
     track.song_id = config.song_id
     print "lyric:", track.get_lyric()
+
 
 @test_func
 def test_song_hqlocation():
@@ -43,6 +46,7 @@ def test_song_hqlocation():
     track.dump_info()
     print "hq location:", track.get_hq_location(state)
 
+
 @test_func
 def test_related_info(state):
     import radio
@@ -50,6 +54,7 @@ def test_related_info(state):
     tracks = radio.get_radio_list(state, state['radio_type'], state['radio_id'])
     track = tracks[0]
     print track.get_related_info(state)
+
 
 @test_func
 def test_similar_artists():
@@ -64,6 +69,7 @@ def test_similar_artists():
         assert('category' in artist)
         assert('name' in artist)
 
+
 @test_func
 def test_song_url():
     import song
@@ -71,6 +77,7 @@ def test_song_url():
     track.song_id = config.song_id
     print track.get_song_url()
     urllib2.urlopen(track.get_song_url()).read()
+
 
 @test_func
 def test_fav_radio(state):
@@ -81,6 +88,7 @@ def test_fav_radio(state):
         radio.visit_radio(state, fav_radio['radio_id'])
         tracks = radio.get_radio_list(state, state['radio_type'], state['radio_id'])
         tracks[0].dump_info()
+
 
 @test_func
 def test_radio_list(state):

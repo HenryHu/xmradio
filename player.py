@@ -4,6 +4,7 @@ import init
 import logging
 import playlist
 
+
 def play(filename):
     state = init.init()
     console.authenticate(state)

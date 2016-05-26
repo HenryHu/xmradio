@@ -5,14 +5,15 @@ import time
 
 is_vip_url = "http://www.xiami.com/vip/role"
 stat_url_temp = "http://www.xiami.com/count/playstat?type=%d&vip_role=%d&song_id=%s"
-record_play_url_temp = "http://www.xiami.com/count/playrecord?object=%s&sid=%s&object_name=%s&ishq=%d&t=%d"
-record_play_simple_url_temp = "http://www.xiami.com/count/playrecord?sid=%s&type=%s&ishq=%d"
+record_play_url_temp = "http://www.xiami.com/count/playrecord?object=%s&sid=%s&object_name=%s&ishq=%d&t=%d"  # noqa
+record_play_simple_url_temp = "http://www.xiami.com/count/playrecord?sid=%s&type=%s&ishq=%d"  # noqa
 
 logger = logging.getLogger('info')
 
 STAT_BEGIN = 0
 STAT_NEAREND = 2
 STAT_END = 3
+
 
 def update_state(state, config_node):
     for child in config_node:
@@ -25,12 +26,14 @@ def update_state(state, config_node):
         elif child.tag == 'vip_role':
             state['vip_role'] = child.text
 
+
 def get_xiamitoken(state):
     for cookie in state['cookiejar']:
         if cookie.name == '_xiamitoken':
             logger.debug('_xiamitoken = %s' % cookie.value)
             return cookie.value
     raise Exception("fail to find xiami token!")
+
 
 def authenticated(state):
     for cookie in state['cookiejar']:
@@ -40,12 +43,13 @@ def authenticated(state):
     logger.debug('not authenticated')
     return False
 
+
 def is_vip(state):
     if 'vip' in state:
         return state['vip']
     isvip_resp = urllib2.urlopen(is_vip_url).read()
     isvip_parsed = json.loads(isvip_resp)
-    if not 'status' in isvip_parsed or isvip_parsed['status'] != 1:
+    if 'status' not in isvip_parsed or isvip_parsed['status'] != 1:
         if 'message' in isvip_parsed:
             raise Exception(u"fail to check vip status: %s" % isvip_parsed['message'])
         else:
@@ -54,9 +58,11 @@ def is_vip(state):
     state['vip'] = result
     return result
 
+
 def add_stat(state, pos, song_id):
     stat_url = stat_url_temp % (pos, 1 if is_vip(state) else 0, song_id)
     urllib2.urlopen(stat_url).read()
+
 
 def record_play(state, song_id, object_name, is_hq, play_type):
     hq_arg = 1 if is_hq else 0
@@ -67,4 +73,3 @@ def record_play(state, song_id, object_name, is_hq, play_type):
         record_play_url = record_play_simple_url_temp % (
                 song_id, play_type, hq_arg)
     urllib2.urlopen(record_play_url).read()
-

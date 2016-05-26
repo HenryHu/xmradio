@@ -15,9 +15,10 @@ get_hq_url_temp = "http://www.xiami.com/song/gethqsong/sid/%s"
 similar_artists_url_temp = "http://www.xiami.com/ajax/similar-artists?id=%s&c=%d"
 song_url_temp = "http://www.xiami.com/song/%s"
 artist_id_rex = re.compile("/artist/([0-9]+)")
-song_info_url_temp = "http://www.xiami.com/song/playlist/id/%s/object_name/default/object_id/0/cat/json"
+song_info_url_temp = "http://www.xiami.com/song/playlist/id/%s/object_name/default/object_id/0/cat/json"  # noqa
 
 logger = logging.getLogger('song')
+
 
 class SongPageParser(HTMLParser):
     def __init__(self):
@@ -68,6 +69,7 @@ class SongPageParser(HTMLParser):
             if self.in_nav:
                 self.in_nav = False
 
+
 class Song(object):
     # expected attributes:
     # * title
@@ -82,7 +84,7 @@ class Song(object):
     # * artist_id
     # * rec_note
     # * hq_location
-    def __init__(self, parsed = {}):
+    def __init__(self, parsed={}):
         for key in parsed:
             setattr(self, key, parsed[key])
 
@@ -123,7 +125,7 @@ class Song(object):
         if not hasattr(self, 'song_id'):
             raise Exception("missing song id")
         # use POST as the official one
-        args = urllib.urlencode({'sid' : self.song_id})
+        args = urllib.urlencode({'sid': self.song_id})
         lyric = urllib2.urlopen(lyric_url, args).read()
         return lyric
 
@@ -149,7 +151,7 @@ class Song(object):
             logger.exception("fail to parse get hq reply: %s", get_hq_rep)
             raise e
 
-        if not 'status' in get_hq_parsed or get_hq_parsed['status'] != 1:
+        if 'status' not in get_hq_parsed or get_hq_parsed['status'] != 1:
             raise Exception("fail to get hq url. status = %d" % get_hq_parsed['status'])
 
         # should not be reused; timeout after a while
@@ -194,9 +196,9 @@ class Song(object):
         song_info_ret = urllib2.urlopen(song_info_url).read()
         song_info = json.loads(song_info_ret)
 
-        if not 'status' in song_info or not song_info['status']:
+        if 'status' not in song_info or not song_info['status']:
             raise Exception("fail to load song info.%s" %
-                (song_info['message'] if 'message' in song_info else ""))
+                            (song_info['message'] if 'message' in song_info else ""))
 
         my_info = song_info['data']['trackList'][0]
         self.__init__(my_info)
@@ -218,6 +220,7 @@ class Song(object):
         self.pic = parser.image
         self.album_id = parser.album_id
         self.artist_id = parser.artist_id
+
 
 def decrypt_location(encrypted):
     output = ''
@@ -264,4 +267,3 @@ def decrypt_location(encrypted):
 
     # why 0 is replaced by ^.....
     return urllib.unquote(output).replace('^', '0')
-

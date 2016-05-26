@@ -14,6 +14,7 @@ logger = logging.getLogger("console")
 
 ERROR_WAIT = 5
 
+
 def play_track(state, track):
     is_hq = info.is_vip(state)
     if is_hq:
@@ -25,7 +26,9 @@ def play_track(state, track):
             is_hq = False
     else:
         url = track.location
-    print("Listening to: %s by %s from album %s%s #%s" % (track.title, track.artist, track.album_name, " [HQ]" if is_hq else "", track.song_id))
+    print("Listening to: %s by %s from album %s%s #%s" %
+          (track.title, track.artist, track.album_name, " [HQ]" if is_hq else "",
+           track.song_id))
     try:
         info.add_stat(state, info.STAT_BEGIN, track.song_id)
     except Exception as e:
@@ -36,6 +39,7 @@ def play_track(state, track):
         info.add_stat(state, info.STAT_END, track.song_id)
     except Exception as e:
         print("WARNING: error occoured when reporting stat: %r" % e)
+
 
 def play_guessed_list(state):
     guessed_list = playlist.get_guess_list(state)
@@ -50,6 +54,7 @@ def play_guessed_list(state):
             except:
                 logger.exception("fail to record")
             time.sleep(1)
+
 
 def play_radio(state, radio_id):
     radio.visit_radio(state, radio_id)
@@ -71,6 +76,7 @@ def play_radio(state, radio_id):
                 logger.exception("fail to record")
             time.sleep(1)
 
+
 def select_radio_station(state):
     fav_radio_page = 1
     sel_radio = None
@@ -91,10 +97,14 @@ def select_radio_station(state):
         idx = 1
         unescaper = HTMLParser.HTMLParser()
         for fav_radio in fav_radios:
-            print("Radio %d: %s fav by %s people" % (idx, unescaper.unescape(fav_radio['radio_name']), fav_radio['fav_count']))
+            print("Radio %d: %s fav by %s people" %
+                  (idx, unescaper.unescape(fav_radio['radio_name']),
+                   fav_radio['fav_count']))
             print("    %s" % (unescaper.unescape(fav_radio['description'])))
             idx += 1
-        sel = raw_input("Select radio station [1-%d], [n] for next page, [p] for prev page, [g] for guessed playlist, [r] for random:" % (len(fav_radios)))
+        sel = raw_input("Select radio station [1-%d], [n] for next page, " +
+                        "[p] for prev page, [g] for guessed playlist, [r] for random:" %
+                        (len(fav_radios)))
 
         state['random'] = False
         if 'r' in sel:
@@ -124,6 +134,7 @@ def select_radio_station(state):
     print("Listening to radio %s (%s)" % (sel_radio['radio_id'], sel_radio['object_id']))
 
     return sel_radio['radio_id']
+
 
 def authenticate(state):
     if not info.authenticated(state):

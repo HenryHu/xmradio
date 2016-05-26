@@ -2,11 +2,11 @@ import cookielib
 import urllib2
 import logging
 import atexit
-import logging
 
 cookie_store = "cookies.txt"
 
 logger = logging.getLogger('init')
+
 
 def init():
     logging.basicConfig(level=logging.DEBUG)
@@ -19,14 +19,16 @@ def init():
         logger.info('no cookies present')
 
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-    opener.addheaders = (('User-agent', 'Mozilla/5.0 ( X11; Linux x86_64; rv:28.0) Gecko/20100101 Firefox/28.0'),)
+    opener.addheaders = (
+        ('User-agent',
+         'Mozilla/5.0 (X11; Linux x86_64; rv:46.0.1) Gecko/20100101 Firefox/46.0.1'),)
     urllib2.install_opener(opener)
 
     state = {'cookiejar': cj}
     atexit.register(save_cookies, state)
     return state
 
+
 def save_cookies(state):
     state['cookiejar'].save()
     logging.info('cookies saved')
-
