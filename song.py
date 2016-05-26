@@ -4,6 +4,9 @@ import json
 import logging
 import info
 import re
+import base64
+import simplejson
+import zlib
 from HTMLParser import HTMLParser
 
 lyric_url = "http://www.xiami.com/radio/lyric"
@@ -92,6 +95,20 @@ class Song(object):
     def from_id(song_id):
         song_info = {'song_id': str(song_id)}
         return Song(song_info)
+
+    @staticmethod
+    def from_encoded(encoded):
+        try:
+            decoded = simplejson.loads(zlib.decompress(base64.b64decode(encoded)))
+            song = Song()
+            for key in decoded:
+                setattr(song, key, decoded[key])
+            return song
+        except:
+            return None
+
+    def encode(self):
+        return base64.b64encode(zlib.compress(simplejson.dumps(vars(self))))
 
     def dump_info(self):
         print self.title, self.location

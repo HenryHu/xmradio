@@ -14,11 +14,14 @@ class LocalPlaylist(object):
             line = inf.readline()
 
             while line:
+                desc = ""
                 if '#' in line:
-                    line = line.split('#', 1)[0]
+                    (line, desc) = line.split('#', 1)
                 line = line.strip()
                 try:
-                    track = song.Song.from_id(int(line))
+                    track = song.Song.from_encoded(desc.split(' ')[-1])
+                    if track is None:
+                        track = song.Song.from_id(int(line))
                     self.items += [track]
                 except:
                     logger.exception("line %s error(%s)" % (line, filename))
@@ -34,7 +37,7 @@ class LocalPlaylist(object):
             os.rename(filename, filename + os.extsep + "old")
         with codecs.open(filename, 'w', 'utf-8') as outf:
             for track in self.items:
-                outf.write(u"{id} # {title} by {artist}\n".format(id=track.song_id, title=track.title, artist=track.artist))
+                outf.write(u"{id} # {title} by {artist} {info}\n".format(id=track.song_id, title=track.title, artist=track.artist, info=track.encode()))
 
     def count(self):
         return len(self.items)
