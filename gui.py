@@ -14,15 +14,15 @@ import song
 
 from PyQt5.QtCore import QObject, QUrl
 from PyQt5.QtQuick import QQuickView
-
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, QtDBus
+from dbus.mainloop.qt import DBusQtMainLoop
 
 logger = logging.getLogger("gui")
 
 ERROR_WAIT = 5
 MAX_HISTORY_LEN = 1000  # seriously?
 SONG_URL_TEMPLATE = "http://www.xiami.com/song/%s"
-
+DBUS_SERVICE_NAME = "net.henryhu.xmradio"
 
 class XMTrayIcon(QtWidgets.QSystemTrayIcon):
     def event(self, evt):
@@ -121,7 +121,10 @@ class ThingsModel(QtCore.QAbstractListModel):
         self.endRemoveRows()
 
     def get(self, index):
-        return self._things[index]
+        if index >= 0 and index < len(self._things):
+            return self._things[index]
+        else:
+            return None
 
     def clear(self):
         self.beginRemoveRows(QtCore.QModelIndex(), 0, self.rowCount() - 1)
@@ -143,6 +146,59 @@ class ThingsModel(QtCore.QAbstractListModel):
         self.modelReset.emit()
         self.last_highlight = idx
 
+class MainWinDBusObject(QtDBus.QDBusAbstractAdaptor):
+    DBUS_OBJECT_PATH = "/player"
+    QtCore.Q_CLASSINFO("D-Bus Interface", 'net.henryhu.xmradio.PlayerInterface')
+    QtCore.Q_CLASSINFO("D-Bus Introspection", ''
+            '  <interface name="net.henryhu.xmradio.PlayerInterface">\n'
+            '    <method name="play"/>\n'
+            '    <method name="stop"/>\n'
+            '    <method name="next"/>\n'
+            '    <method name="prev"/>\n'
+            '    <method name="exit"/>\n'
+            '    <property name="title" type="s" access="read"/>\n'
+            '    <property name="artist" type="s" access="read"/>\n'
+            '    <property name="album" type="s" access="read"/>\n'
+            '  </interface>\n'
+            '')
+
+    def __init__(self, player):
+        QtDBus.QDBusAbstractAdaptor.__init__(self, player)
+        self.player = player
+        session_bus = QtDBus.QDBusConnection.sessionBus()
+        session_bus.registerObject(self.DBUS_OBJECT_PATH, player)
+
+    @QtCore.pyqtSlot(QtDBus.QDBusMessage)
+    def stop(self, msg):
+        self.player.dbus_stop()
+
+    @QtCore.pyqtSlot(QtDBus.QDBusMessage)
+    def play(self, msg):
+        self.player.dbus_play()
+
+    @QtCore.pyqtSlot(QtDBus.QDBusMessage)
+    def prev(self, msg):
+        self.player.dbus_prev()
+
+    @QtCore.pyqtSlot(QtDBus.QDBusMessage)
+    def next(self, msg):
+        self.player.dbus_next()
+
+    @QtCore.pyqtSlot(QtDBus.QDBusMessage)
+    def exit(self, msg):
+        self.player.dbus_exit()
+
+    @QtCore.pyqtProperty(str)
+    def title(self):
+        return self.player.dbus_title()
+
+    @QtCore.pyqtProperty(str)
+    def album(self):
+        return self.player.dbus_album()
+
+    @QtCore.pyqtProperty(str)
+    def artist(self):
+        return self.player.dbus_artist()
 
 class MainWin(QtCore.QObject):
     def __init__(self, state, app):
@@ -436,6 +492,32 @@ class MainWin(QtCore.QObject):
         except:
             logger.exception("fail to record")
 
+    def current_track(self):
+        track = self.playlist_model.get(self.play_idx)
+        if track is not None:
+            return track._track
+
+    def current_title(self):
+        track = self.current_track()
+        if track is not None:
+            return track.get_title()
+        else:
+            return None
+
+    def current_artist(self):
+        track = self.current_track()
+        if track is not None:
+            return track.artist
+        else:
+            return None
+
+    def current_album(self):
+        track = self.current_track()
+        if track is not None:
+            return track.album_name
+        else:
+            return None
+
     # misc
     def key_pressed(self, key, modifiers):
         if key == ord('V') and modifiers == QtCore.Qt.ControlModifier:
@@ -512,6 +594,31 @@ class MainWin(QtCore.QObject):
     def set_tray_tooltip(self, tooltip):
         self.tray_icon.setToolTip(tooltip)
 
+    # dbus functions
+    def dbus_stop(self):
+        self.root_obj.stop()
+
+    def dbus_play(self):
+        self.root_obj.pause()
+
+    def dbus_prev(self):
+        self.prev_clicked()
+
+    def dbus_next(self):
+        self.next_clicked()
+
+    def dbus_exit(self):
+        self.exit_clicked()
+
+    def dbus_title(self):
+        return self.current_title()
+
+    def dbus_artist(self):
+        return self.current_artist()
+
+    def dbus_album(self):
+        return self.current_album()
+
     def create(self):
         # Create the QML user interface.
         self.main_win = QQuickView()
@@ -563,6 +670,8 @@ class MainWin(QtCore.QObject):
         self.tray_icon.activated.connect(self.tray_activated)
         self.tray_icon.forward.connect(self.tray_forward)
         self.tray_icon.back.connect(self.tray_back)
+
+        self.dbus_object = MainWinDBusObject(self)
 
         self.play_idx = 0
         self.duration = 0
@@ -634,12 +743,17 @@ class XiamiPlayer(QtCore.QObject):
 
         self.app = QtWidgets.QApplication(sys.argv)
 
+        DBusQtMainLoop(set_as_default=True)
+        self.session_bus = QtDBus.QDBusConnection.sessionBus()
+        self.session_bus.registerService(DBUS_SERVICE_NAME)
+
         qt_translator = QtCore.QTranslator()
         qt_translator.load("xmradio_%s" % QtCore.QLocale().name(), "lang")
         self.app.installTranslator(qt_translator)
 
         self.authenticate()
 
+    @QtCore.pyqtSlot(QtDBus.QDBusMessage)
     def auth_ok(self):
         self.main_win = MainWin(self.state, self)
         self.main_win.create()
