@@ -15,7 +15,7 @@ import song
 from PyQt5.QtCore import QObject, QUrl
 from PyQt5.QtQuick import QQuickView
 from PyQt5 import QtCore, QtGui, QtWidgets, QtDBus
-from dbus.mainloop.qt import DBusQtMainLoop
+from dbus.mainloop.pyqt5 import DBusQtMainLoop
 
 logger = logging.getLogger("gui")
 
@@ -23,6 +23,7 @@ ERROR_WAIT = 5
 MAX_HISTORY_LEN = 1000  # seriously?
 SONG_URL_TEMPLATE = "http://www.xiami.com/song/%s"
 DBUS_SERVICE_NAME = "net.henryhu.xmradio"
+
 
 class XMTrayIcon(QtWidgets.QSystemTrayIcon):
     def event(self, evt):
@@ -146,21 +147,22 @@ class ThingsModel(QtCore.QAbstractListModel):
         self.modelReset.emit()
         self.last_highlight = idx
 
+
 class MainWinDBusObject(QtDBus.QDBusAbstractAdaptor):
     DBUS_OBJECT_PATH = "/player"
     QtCore.Q_CLASSINFO("D-Bus Interface", 'net.henryhu.xmradio.PlayerInterface')
     QtCore.Q_CLASSINFO("D-Bus Introspection", ''
-            '  <interface name="net.henryhu.xmradio.PlayerInterface">\n'
-            '    <method name="play"/>\n'
-            '    <method name="stop"/>\n'
-            '    <method name="next"/>\n'
-            '    <method name="prev"/>\n'
-            '    <method name="exit"/>\n'
-            '    <property name="title" type="s" access="read"/>\n'
-            '    <property name="artist" type="s" access="read"/>\n'
-            '    <property name="album" type="s" access="read"/>\n'
-            '  </interface>\n'
-            '')
+                       '  <interface name="net.henryhu.xmradio.PlayerInterface">\n'
+                       '    <method name="play"/>\n'
+                       '    <method name="stop"/>\n'
+                       '    <method name="next"/>\n'
+                       '    <method name="prev"/>\n'
+                       '    <method name="exit"/>\n'
+                       '    <property name="title" type="s" access="read"/>\n'
+                       '    <property name="artist" type="s" access="read"/>\n'
+                       '    <property name="album" type="s" access="read"/>\n'
+                       '  </interface>\n'
+                       '')
 
     def __init__(self, player):
         QtDBus.QDBusAbstractAdaptor.__init__(self, player)
@@ -199,6 +201,7 @@ class MainWinDBusObject(QtDBus.QDBusAbstractAdaptor):
     @QtCore.pyqtProperty(str)
     def artist(self):
         return self.player.dbus_artist()
+
 
 class MainWin(QtCore.QObject):
     def __init__(self, state, app):
