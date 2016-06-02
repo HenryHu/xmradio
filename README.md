@@ -26,7 +26,7 @@ Dependencies:
 `gstreamer1.0-plugins-good gstreamer-plugins-base gstreamer1.0-pluseaudio libgstreamer-plugins-bad1.0-0 libqt5gstreamer-1.0-0 python-pyqt5 python-pyqt5.qtmultimedia python-pyqt5.qtquick python-dbus.mainloop.pyqt5`
 * FreeBSD:
 Notice: py-qt5-qtquick is still missing from the ports.
-`py27-qt5-core py27-qt5-gui py27-qt5-multimedia py27-qt5-qml gstreamer1-plugins-neon`
+`py27-qt5-core py27-qt5-gui py27-qt5-multimedia py27-qt5-qml py27-qt5-dbus py27-qt5-dbussupport gstreamer1-plugins-neon`
 
 Run `gui.py`
 
