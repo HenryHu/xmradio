@@ -585,6 +585,7 @@ class MainWin(QtCore.QObject):
     def tray_activated(self, reason):
         if reason == 3:
             self.main_win.show()
+            self.main_win.requestActivate()
         elif reason == 4:
             self.root_obj.pause()
 
