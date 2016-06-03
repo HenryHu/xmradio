@@ -147,6 +147,16 @@ class ThingsModel(QtCore.QAbstractListModel):
         self.modelReset.emit()
         self.last_highlight = idx
 
+class HidingQuickView(QQuickView):
+    def __init__(self):
+        QQuickView.__init__(self)
+
+    def event(self, event):
+        if event.type() == QtCore.QEvent.Close:
+            if QtWidgets.QSystemTrayIcon.isSystemTrayAvailable():
+                self.hide()
+                return True
+        return QQuickView.event(self, event)
 
 class MainWinDBusObject(QtDBus.QDBusAbstractAdaptor):
     DBUS_OBJECT_PATH = "/player"
@@ -625,7 +635,7 @@ class MainWin(QtCore.QObject):
 
     def create(self):
         # Create the QML user interface.
-        self.main_win = QQuickView()
+        self.main_win = HidingQuickView()
         self.main_win.setTitle(self.tr("Xiami Player"))
         self.main_win.setIcon(QtGui.QIcon("icon.png"))
         self.main_win.setSource(QUrl('main.qml'))
