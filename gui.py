@@ -128,9 +128,10 @@ class ThingsModel(QtCore.QAbstractListModel):
             return None
 
     def clear(self):
-        self.beginRemoveRows(QtCore.QModelIndex(), 0, self.rowCount() - 1)
-        self._things = []
-        self.endRemoveRows()
+        if self.rowCount() > 0:
+            self.beginRemoveRows(QtCore.QModelIndex(), 0, self.rowCount() - 1)
+            self._things = []
+            self.endRemoveRows()
 
     def set_highlight(self, idx):
         if self.last_highlight != -1 and self.last_highlight < len(self._things):
@@ -147,6 +148,7 @@ class ThingsModel(QtCore.QAbstractListModel):
         self.modelReset.emit()
         self.last_highlight = idx
 
+
 class HidingQuickView(QQuickView):
     def __init__(self):
         QQuickView.__init__(self)
@@ -157,6 +159,7 @@ class HidingQuickView(QQuickView):
                 self.hide()
                 return True
         return QQuickView.event(self, event)
+
 
 class MainWinDBusObject(QtDBus.QDBusAbstractAdaptor):
     DBUS_OBJECT_PATH = "/player"
