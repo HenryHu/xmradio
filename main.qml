@@ -165,6 +165,7 @@ Rectangle {
                 }
             }
             MouseArea {
+                id: songMouseArea
                 anchors.fill: parent
                 hoverEnabled: true
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -175,6 +176,16 @@ Rectangle {
                 onClicked: songClicked(mouse.button, model.display, model.index)
                 onEntered: songCell.color = "lightgreen"
                 onExited: songCell.color = decideColor()
+                drag.target: songDraggable
+            }
+            Item {
+                id: songDraggable
+                anchors.fill: parent
+                Drag.active: songMouseArea.drag.active
+                Drag.hotSpot.x: 0
+                Drag.hotSpot.y: 0
+                Drag.mimeData: { "text/plain": model.display.song_url }
+                Drag.dragType: Drag.Automatic
             }
         }
     }
@@ -305,6 +316,7 @@ Rectangle {
                 wrapMode: TextEdit.Wrap
             }
             MouseArea {
+                id: stationMouseArea
                 anchors.fill: parent
                 onDoubleClicked: {
                     favStations.currentIndex = model.index
@@ -313,6 +325,16 @@ Rectangle {
                 hoverEnabled: true
                 onEntered: stationCell.color = "lightgreen"
                 onExited: stationCell.color = decideColor()
+                drag.target: stationDraggable
+            }
+            Item {
+                id: stationDraggable
+                anchors.fill: parent
+                Drag.active: stationMouseArea.drag.active
+                Drag.hotSpot.x: 0
+                Drag.hotSpot.y: 0
+                Drag.mimeData: { "text/plain": model.display.station_url }
+                Drag.dragType: Drag.Automatic
             }
         }
     }

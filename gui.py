@@ -22,6 +22,7 @@ logger = logging.getLogger("gui")
 ERROR_WAIT = 5
 MAX_HISTORY_LEN = 1000  # seriously?
 SONG_URL_TEMPLATE = "http://www.xiami.com/song/%s"
+STATION_URL_TEMPLATE = "http://www.xiami.com/radio/play/id/%s"
 DBUS_SERVICE_NAME = "net.henryhu.xmradio"
 
 
@@ -59,10 +60,14 @@ class StationWrapper(QtCore.QObject):
     def _highlight(self):
         return self._highlight
 
+    def _station_url(self):
+        return STATION_URL_TEMPLATE % self._station['radio_id']
+
     changed = QtCore.pyqtSignal()
     title = QtCore.pyqtProperty(unicode, _title, notify=changed)
     desc = QtCore.pyqtProperty(unicode, _desc, notify=changed)
     highlight = QtCore.pyqtProperty(bool, _highlight, notify=changed)
+    station_url = QtCore.pyqtProperty(unicode, _station_url, notify=changed)
 
 
 class SongWrapper(QtCore.QObject):
@@ -89,11 +94,15 @@ class SongWrapper(QtCore.QObject):
     def _highlight(self):
         return self.is_highlight
 
+    def _song_url(self):
+        return SONG_URL_TEMPLATE % self._track.song_id
+
     changed = QtCore.pyqtSignal()
     title = QtCore.pyqtProperty(unicode, _title, notify=changed)
     desc = QtCore.pyqtProperty(unicode, _desc, notify=changed)
     image_url = QtCore.pyqtProperty(unicode, _image_url, notify=changed)
     highlight = QtCore.pyqtProperty(bool, _highlight, notify=changed)
+    song_url = QtCore.pyqtProperty(unicode, _song_url, notify=changed)
 
 
 class ThingsModel(QtCore.QAbstractListModel):
