@@ -109,16 +109,16 @@ Rectangle {
 
         Button {
             id: bLogin
-            x: 13
-            y: 8
+            x: 8
+            y: 0
             text: qsTr("Login")
             onClicked: loginClicked(eUsername.text, ePassword.text)
         }
 
         Button {
             id: bExit
-            x: 173
-            y: 8
+            x: 186
+            y: 0
             text: qsTr("Exit")
             onClicked: exitClicked()
         }
@@ -126,16 +126,16 @@ Rectangle {
 
     Text {
         id: lblCode
-        x: 223
-        y: 133
+        x: 221
+        y: 121
         text: qsTr("Code:")
         visible: false
     }
 
     TextField {
         id: eCode
-        x: 275
-        y: 130
+        x: 284
+        y: 115
         placeholderText: qsTr("Code")
         visible: false
     }
